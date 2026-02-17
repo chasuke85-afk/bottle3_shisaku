@@ -31,7 +31,7 @@
         .chip.selected { background: var(--accent); color: white; }
         .selector-footer { display: flex; justify-content: space-between; margin-top: 10px; }
 
-        /* 瓶エリア（SP最適化） */
+        /* 瓶エリア */
         .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 96%; max-width: 800px; padding-bottom: 20px; }
         .bottle-card { background: white; border-radius: 18px; padding: 15px 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.07); text-align: center; position: relative; border: 1px solid #f0f0f0; }
         .bottle-name-edit { width: 90%; font-size: 0.85rem; font-weight: bold; text-align: center; margin-bottom: 8px; border: 1px dashed #ccc; background: #fff; padding: 4px; }
@@ -41,15 +41,11 @@
         .del-btn { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; background: #eee; color: #999; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
         .comment-area { width: 100%; margin-top: 10px; font-size: 0.75rem; height: 45px; resize: none; border: 1px solid #f0f0f0; background: #fafafa; }
 
-        /* ボタン */
         .btn-main { background: var(--accent); color: white; width: 90%; max-width: 350px; margin: 30px 0; font-size: 1.1rem; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; height: 55px; box-shadow: 0 5px 20px rgba(255, 77, 121, 0.4); }
         .btn-mini { font-size: 0.7rem; padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; background: #666; color: white; }
 
-        /* モーダル */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; overflow-y: auto; }
         .modal-content { background: white; border-radius: 25px; padding: 25px; width: 100%; max-width: 450px; text-align: center; }
-        .modal-guide-img { display: flex; align-items: flex-end; justify-content: center; gap: 15px; margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 15px; }
-        .guide-arrow { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: bold; }
         
         #resultArea { display: none; width: 94%; max-width: 600px; background: white; border-radius: 20px; padding: 25px; text-align: center; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
     </style>
@@ -57,7 +53,7 @@
 <body>
 
     <nav class="g-nav">
-        <div class="nav-item active" id="nav-make" onclick="location.href=window.location.pathname">クイズを作る</div>
+        <div class="nav-item active" id="nav-make" onclick="location.href=window.location.origin + window.location.pathname">クイズを作る</div>
         <div class="nav-item" id="nav-solve">クイズを当てる</div>
     </nav>
 
@@ -70,7 +66,6 @@
                 <input type="text" id="customInput" placeholder="自由入力..." style="flex: 1;">
                 <button onclick="addCustomItem()" style="background: #333; color: white; border: none; border-radius: 8px; padding: 0 15px; font-weight: bold;">追加</button>
             </div>
-
             <div class="preset-scroll" id="presetScrollArea">
                 <div class="preset-label">身体・部位</div><div class="preset-group" id="pre-1"></div>
                 <div class="preset-label">髪型</div><div class="preset-group" id="pre-2"></div>
@@ -78,21 +73,10 @@
                 <div class="preset-label">性向・属性</div><div class="preset-group" id="pre-4"></div>
                 <div class="preset-label">行為・行動</div><div class="preset-group" id="pre-5"></div>
             </div>
-
             <div class="selector-footer">
                 <button class="btn-mini" onclick="clearAllItems()" style="background:#bbb;">全解除</button>
                 <button class="btn-mini" onclick="randomSelect()" style="background:var(--guide-blue);">ランダムに20個選ぶ</button>
             </div>
-        </div>
-
-        <div class="box-common guide-box">
-            <span class="box-title">〜 クイズ発行までの流れ 〜</span>
-            <div style="font-size: 0.8rem; line-height: 1.8; color: var(--guide-blue); font-weight: bold; text-align: center;">
-                1. 瓶を20個選ぶ（自由入力・名称変更OK）<br>
-                2. 下の瓶に「色」と「量」を注ぐ<br>
-                3. 「クイズを発行」して友達に送る
-            </div>
-            <button class="btn-mini" onclick="toggleModal(true)" style="width:100%; margin-top:12px; background:var(--rule-color); height:40px; font-size:0.85rem;">判定ルール・図解を見る</button>
         </div>
 
         <div class="container" id="bottleContainer"></div>
@@ -101,40 +85,8 @@
 
     <div id="resultArea">
         <h2 id="totalScore" style="font-size:3.5rem; color:var(--accent); margin:0;">0%</h2>
-        <h3 id="rankTitle" style="margin-top:0;"></h3>
         <div id="comparisonList" style="margin: 20px 0;"></div>
-        <button class="btn-main" onclick="location.reload()">自分もクイズを作る</button>
-    </div>
-
-    <div class="modal-overlay" id="ruleModal" onclick="toggleModal(false)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="color:var(--rule-color); margin-top:0;">性癖瓶の注ぎ方</h3>
-            
-            <div class="modal-guide-img">
-                <div class="guide-arrow">
-                    <span style="color:var(--accent)">好き！</span>
-                    <div style="font-size:1.5rem;">↑</div>
-                </div>
-                <div class="bottle-frame" style="margin:0; width:55px; height:80px; border-width:2px;">
-                    <div class="liquid" style="height:70%; background:var(--accent); opacity:0.8;"></div>
-                </div>
-                <div class="bottle-frame" style="margin:0; width:55px; height:80px; border-width:2px;">
-                    <div class="liquid" style="height:40%; background:var(--blue); opacity:0.8;"></div>
-                </div>
-                <div class="guide-arrow">
-                    <span style="color:var(--blue)">苦手…</span>
-                    <div style="font-size:1.5rem;">↑</div>
-                </div>
-            </div>
-
-            <div style="text-align:left; font-size:0.8rem; line-height:1.6; color:#555;">
-                <p>● <b>色（属性）</b>：ピンクは「好き」、ブルーは「苦手・地雷」を指します。「普通」は禁止！どちらかに決めてください。</p>
-                <p>● <b>量（熱量）</b>：1%〜100%で注ぎます。量が多いほど、その感情（好き/苦手）が強いことを示します。</p>
-                <p>● <b>コメント</b>：なぜ好きなのか、どんな解釈なのかを一言添えると、正解率が上がります！</p>
-            </div>
-            
-            <button class="btn-main" style="width:100%; height:45px; margin:20px 0 0;" onclick="toggleModal(false)">OK！理解した</button>
-        </div>
+        <button class="btn-main" onclick="location.href=window.location.origin + window.location.pathname">自分もクイズを作る</button>
     </div>
 
     <script>
@@ -148,6 +100,7 @@
         const COLORS = { pink: '#ff5d8f', blue: '#6366f1' };
         let selectedItems = [];
         let pressTimer = null;
+        let quizData = null;
 
         function init() {
             PRESET_DATA.forEach(group => {
@@ -171,7 +124,7 @@
                 document.getElementById('chip-' + name)?.classList.remove('selected');
             } else {
                 if (selectedItems.length >= 20) return alert("上限20個です！");
-                selectedItems.push({ name: name, color: COLORS.pink, level: 10, note: '' });
+                selectedItems.push({ name: name, color: 'pink', level: 10, note: '' });
                 document.getElementById('chip-' + name)?.classList.add('selected');
             }
             renderBottles();
@@ -181,7 +134,7 @@
             const val = document.getElementById('customInput').value.trim();
             if (!val) return;
             if (selectedItems.length >= 20) return alert("上限20個です！");
-            selectedItems.push({ name: val, color: COLORS.pink, level: 10, note: '' });
+            selectedItems.push({ name: val, color: 'pink', level: 10, note: '' });
             document.getElementById('customInput').value = '';
             renderBottles();
         }
@@ -210,10 +163,10 @@
                     <div class="del-btn" onclick="removeItem(${i})">×</div>
                     <input type="text" class="bottle-name-edit" value="${b.name}" onchange="updateName(${i}, this.value)">
                     <div style="display:flex; justify-content:center; gap:12px; margin-bottom:5px;">
-                        <div style="width:18px;height:18px;border-radius:50%;background:${COLORS.pink};border:${b.color===COLORS.pink?'3px solid #333':'none'}" onclick="updateColor(${i},'pink')"></div>
-                        <div style="width:18px;height:18px;border-radius:50%;background:${COLORS.blue};border:${b.color===COLORS.blue?'3px solid #333':'none'}" onclick="updateColor(${i},'blue')"></div>
+                        <div style="width:18px;height:18px;border-radius:50%;background:${COLORS.pink};border:${b.color==='pink'?'3px solid #333':'none'}" onclick="updateColor(${i},'pink')"></div>
+                        <div style="width:18px;height:18px;border-radius:50%;background:${COLORS.blue};border:${b.color==='blue'?'3px solid #333':'none'}" onclick="updateColor(${i},'blue')"></div>
                     </div>
-                    <div class="bottle-frame"><div id="liq-${i}" class="liquid" style="height:${b.level}%; background:${b.color}; opacity:0.8;"></div></div>
+                    <div class="bottle-frame"><div id="liq-${i}" class="liquid" style="height:${b.level}%; background:${COLORS[b.color]}; opacity:0.8;"></div></div>
                     <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
                         <button class="p-btn" onmousedown="startPress(${i},-2)" ontouchstart="startPress(${i},-2)" onmouseup="stopPress()" ontouchend="stopPress()" onmouseleave="stopPress()">−</button>
                         <span id="lv-${i}" style="font-size:0.85rem; font-weight:bold; width:35px;">${b.level}%</span>
@@ -225,16 +178,11 @@
             });
         }
 
-        function startPress(i, dir) {
-            stopPress();
-            updateStep(i, dir);
-            pressTimer = setInterval(() => updateStep(i, dir), 60);
-        }
+        function startPress(i, dir) { stopPress(); updateStep(i, dir); pressTimer = setInterval(() => updateStep(i, dir), 60); }
         function stopPress() { clearInterval(pressTimer); }
         function updateStep(i, dir) {
             let next = selectedItems[i].level + dir;
-            if (next < 1) next = 1;
-            if (next > 100) next = 100;
+            if (next < 1) next = 1; if (next > 100) next = 100;
             selectedItems[i].level = next;
             document.getElementById(`liq-${i}`).style.height = next + '%';
             document.getElementById(`lv-${i}`).innerText = next + '%';
@@ -242,48 +190,57 @@
 
         function updateName(i, v) { selectedItems[i].name = v; }
         function updateNote(i, v) { selectedItems[i].note = v; }
-        function updateColor(i, type) { selectedItems[i].color = COLORS[type]; renderBottles(); }
-        
+        function updateColor(i, type) { selectedItems[i].color = type; renderBottles(); }
         function removeItem(i) { 
             const name = selectedItems[i].name;
-            selectedItems.splice(i, 1); 
-            document.getElementById('chip-' + name)?.classList.remove('selected');
+            selectedItems.splice(i, 1);
+            document.querySelectorAll('.chip').forEach(c => { if(c.innerText === name) c.classList.remove('selected'); });
             renderBottles(); 
         }
-        function toggleModal(s) { document.getElementById('ruleModal').style.display = s ? 'flex' : 'none'; }
+
+        // 執念のコピー機能
+        function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text);
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed"; 
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                } catch (err) {
+                    console.error('Fallback copy failed', err);
+                }
+                document.body.removeChild(textArea);
+                return Promise.resolve();
+            }
+        }
 
         function publishQuiz() {
             if (selectedItems.length === 0) return alert("瓶を1つ以上選んでください！");
-            const pw = prompt("回答者が入力するパスワードを決めてください");
+            const pw = prompt("友達へのパスワードを決めてください");
             if (!pw) return;
             
             const dataObj = { p: pw, b: selectedItems };
             const jsonStr = JSON.stringify(dataObj);
-            const base64Data = btoa(encodeURIComponent(jsonStr));
+            // URLを短くするためにエンコードを工夫
+            const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
             const url = window.location.origin + window.location.pathname + '?q=' + base64Data;
             
-            const textArea = document.createElement("textarea");
-            textArea.value = url;
-            document.body.appendChild(textArea);
-            textArea.select();
-            let success = false;
-            try {
-                success = document.execCommand('copy');
-            } catch (err) {}
-            document.body.removeChild(textArea);
-
-            if (success) {
+            copyToClipboard(url).then(() => {
                 alert("クイズリンクをコピーしました！友達に送ってください。");
-            } else {
-                prompt("リンクを長押ししてコピーしてください:", url);
-            }
+            }).catch(() => {
+                prompt("コピーに失敗しました。下のリンクを長押ししてコピーしてください：", url);
+            });
         }
 
         window.onload = () => {
             const q = new URLSearchParams(window.location.search).get('q');
             if (q) {
                 try {
-                    const decodedJson = decodeURIComponent(atob(q));
+                    const decodedJson = decodeURIComponent(escape(atob(q)));
                     quizData = JSON.parse(decodedJson);
                     startSolveMode();
                 } catch(e) {
@@ -299,7 +256,8 @@
             document.getElementById('pageTitle').innerText = "友達の性癖を当てろ！";
             document.getElementById('nav-make').classList.remove('active');
             document.getElementById('nav-solve').classList.add('active');
-            selectedItems = quizData.b.map(b => ({ name: b.name, color: COLORS.pink, level: 10, note: '' }));
+            // 回答モードでは初期値をリセット
+            selectedItems = quizData.b.map(b => ({ name: b.name, color: 'pink', level: 10, note: '' }));
             renderBottles();
             const btn = document.getElementById('actionBtn');
             btn.innerText = "答え合わせをする！";
@@ -326,8 +284,8 @@
             list.innerHTML = selectedItems.map((my, i) => {
                 const ans = quizData.b[i];
                 return `<div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding:10px 0; font-size:0.8rem;">
-                    <div style="text-align:left;"><b>${ans.name}</b><br><small style="color:#888;">正解: ${ans.color===COLORS.pink?'好':'苦'} ${ans.level}%</small></div>
-                    <div style="color:var(--accent); font-size:0.7rem; max-width:50%;">💬${ans.note || '解説なし'}</div>
+                    <div style="text-align:left;"><b>${ans.name}</b><br><small style="color:#888;">正解: ${ans.color==='pink'?'好':'苦'} ${ans.level}%</small></div>
+                    <div style="color:var(--accent); font-size:0.7rem; max-width:50%; text-align:right;">💬${ans.note || '解説なし'}</div>
                 </div>`;
             }).join('');
             window.scrollTo(0,0);
