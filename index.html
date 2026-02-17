@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>性癖瓶 QUIZ prototype</title>
+    <style>
+        :root { --accent: #ff4d79; --blue: #6366f1; --bg: #fdfbfb; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; color: #444; }
+        
+        /* グローバルナビ */
+        .g-nav { width: 100%; background: #fff; display: flex; justify-content: center; gap: 20px; padding: 10px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .nav-item { font-size: 0.8rem; font-weight: bold; cursor: pointer; color: #ccc; padding: 5px 10px; border-radius: 15px; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); background: #fff0f3; }
+
+        /* ページ制御 */
+        .page { display: none; width: 100%; max-width: 600px; padding: 20px; text-align: center; }
+        .page.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ボトルデザイン（共通） */
+        .bottle-card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; }
+        .bottle-frame { width: 50px; height: 80px; border: 3px solid #333; border-radius: 2px 2px 15px 15px; margin: 10px auto; position: relative; overflow: hidden; }
+        .liquid { position: absolute; bottom: 0; width: 100%; transition: height 0.1s linear; }
+        
+        .p-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: #eee; cursor: pointer; font-size: 1.2rem; }
+        .color-btn { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+        .color-btn.active { border-color: #333; }
+
+        /* リザルト用 */
+        .result-pair { display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px; padding: 10px; border-bottom: 1px dashed #ddd; }
+        .warning-label { color: red; font-weight: bold; font-size: 0.7rem; position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: white; border: 1px solid red; padding: 2px 5px; z-index: 5; }
+
+        .main-btn { padding: 12px 24px; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; background: var(--accent); color: white; margin-top: 20px; }
+        input[type="text"] { padding: 10px; border-radius: 8px; border: 1px solid #ddd; width: 80%; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+    <nav class="g-nav">
+        <div class="nav-item active" id="nav-home" onclick="showPage('home')">🏠 つくる</div>
+        <div class="nav-item" id="nav-quiz" onclick="showPage('quiz')">🎮 クイズ</div>
+        <div class="nav-item" id="nav-result" id="nav-result">🏆 結果</div>
+    </nav>
+
+    <div id="home" class="page active">
+        <h2>自分用の性癖瓶</h2>
+        <p style="font-size: 0.7rem;">まずは正解となる瓶を3つ作ってみてね</p>
+        <div id="home-bottles"></div>
+        <button class="main-btn" onclick="startQuizMode()">この内容でクイズを出す！</button>
+    </div>
+
+    <div id="quiz" class="page">
+        <h2>誰かさんの性癖予想</h2>
+        <div id="name-input-area">
+            <p>あなたの名前を入れてね</p>
+            <input type="text" id="player-name" placeholder="回答者の名前">
+            <button class="main-btn" onclick="beginAnswering()">予想を始める</button>
+        </div>
+        <div id="answer-area" style="display:none;">
+            <p id="target-msg"></p>
+            <div id="quiz-bottles"></div>
+            <button class="main-btn" onclick="calculateResult()">答え合わせ！</button>
+        </div>
+    </div>
+
+    <div id="result" class="page">
+        <h2 id="result-title">結果発表</h2>
+        <div id="score-display" style="font-size: 2rem; font-weight: bold; color: var(--accent); margin-bottom: 10px;"></div>
+        <div id="rank-display" style="font-weight: bold; margin-bottom: 20px;"></div>
+        <div id="result-list"></div>
+        <button class="main-btn" style="background: #333;" onclick="location.reload()">もう一度あそぶ</button>
+    </div>
+
+    <script>
+        // --- データ管理 ---
+        let correctData = []; // Bさんの正解
+        let answerData = [];  // Aさんの回答
+        let playerName = "";
+
+        const PRESETS = ["巨乳", "制服", "ツンデレ"]; // 仮の3項目
+
+        // --- 初期化 ---
+        function init() {
+            const homeList = document.getElementById('home-bottles');
+            correctData = PRESETS.map(name => ({ name, color: '#ff4d79', level: 50 }));
+            renderBottles('home-bottles', correctData, true);
+        }
+
+        // --- 描画関数 ---
+        function renderBottles(containerId, dataArray, isEditable) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            dataArray.forEach((b, i) => {
+                const card = document.createElement('div');
+                card.className = 'bottle-card';
+                card.innerHTML = `
+                    <div style="font-weight:bold; margin-bottom:10px;">${b.name}</div>
+                    <div style="display:flex; justify-content:center; gap:15px; margin-bottom:10px;">
+                        <div class="color-btn ${b.color === '#ff4d79' ? 'active' : ''}" style="background:#ff4d79;" onclick="updateColor('${containerId}', ${i}, '#ff4d79')"></div>
+                        <div class="color-btn ${b.color === '#6366f1' ? 'active' : ''}" style="background:#6366f1;" onclick="updateColor('${containerId}', ${i}, '#6366f1')"></div>
+                    </div>
+                    <div class="bottle-frame">
+                        <div class="liquid" style="height:${b.level}%; background:${b.color};"></div>
+                    </div>
+                    <div>
+                        <button class="p-btn" onclick="updateLevel('${containerId}', ${i}, -5)">-</button>
+                        <span style="font-weight:bold; width:40px; display:inline-block;">${b.level}%</span>
+                        <button class="p-btn" onclick="updateLevel('${containerId}', ${i}, 5)">+</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- 操作系 ---
+        function updateLevel(cid, idx, diff) {
+            const arr = (cid === 'home-bottles') ? correctData : answerData;
+            arr[idx].level = Math.max(0, Math.min(100, arr[idx].level + diff));
+            renderBottles(cid, arr, true);
+        }
+
+        function updateColor(cid, idx, color) {
+            const arr = (cid === 'home-bottles') ? correctData : answerData;
+            arr[idx].color = color;
+            renderBottles(cid, arr, true);
+        }
+
+        // --- 画面遷移 ---
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const nav = document.getElementById('nav-' + id);
+            if(nav) nav.classList.add('active');
+        }
+
+        // --- クイズの流れ ---
+        function startQuizMode() {
+            showPage('quiz');
+        }
+
+        function beginAnswering() {
+            playerName = document.getElementById('player-name').value || "ななしさん";
+            document.getElementById('name-input-area').style.display = 'none';
+            document.getElementById('answer-area').style.display = 'block';
+            document.getElementById('target-msg').innerText = `${playerName}さん、出題者の性癖を予想して注いでね！`;
+            
+            // 回答用データを初期化（最初は0%から）
+            answerData = correctData.map(b => ({ name: b.name, color: '#ff4d79', level: 0 }));
+            renderBottles('quiz-bottles', answerData, true);
+        }
+
+        // --- スコア計算・結果 ---
+        function calculateResult() {
+            let totalScore = 0;
+            let resultHtml = "";
+            let conflicts = 0;
+
+            answerData.forEach((ans, i) => {
+                const cor = correctData[i];
+                let itemScore = 0;
+
+                // 色判定 (5点)
+                const colorMatch = (ans.color === cor.color);
+                if (colorMatch) itemScore += 5;
+                else {
+                    itemScore -= 5; // 解釈違い
+                    conflicts++;
+                }
+
+                // 濃度判定 (5点)
+                const diff = Math.abs(ans.level - cor.level);
+                if (diff <= 10) itemScore += 5;
+                else if (diff <= 25) itemScore += 3;
+                else if (diff <= 40) itemScore += 1;
+
+                totalScore += itemScore;
+
+                resultHtml += `
+                    <div class="result-pair">
+                        <div style="position:relative;">
+                            ${!colorMatch ? '<div class="warning-label">解釈違い！</div>' : ''}
+                            <div class="bottle-frame" style="transform:scale(0.8);"><div class="liquid" style="height:${ans.level}%; background:${ans.color};"></div></div>
+                            <div style="font-size:0.6rem;">予想</div>
+                        </div>
+                        <div style="font-weight:bold;">${ans.name}</div>
+                        <div>
+                            <div class="bottle-frame" style="transform:scale(0.8);"><div class="liquid" style="height:${cor.level}%; background:${cor.color}; opacity:0.5;"></div></div>
+                            <div style="font-size:0.6rem;">正解</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const finalScore = Math.max(0, Math.round((totalScore / (correctData.length * 10)) * 100));
+            document.getElementById('score-display').innerText = finalScore + "点";
+            document.getElementById('result-list').innerHTML = resultHtml;
+
+            // 称号
+            let rank = "";
+            if(conflicts >= 2) rank = "称号：【混ぜるな危険】";
+            else if(finalScore >= 90) rank = "称号：【前世は双子】";
+            else if(finalScore >= 60) rank = "称号：【良き理解者】";
+            else rank = "称号：【すれ違いの純情】";
+            
+            document.getElementById('rank-display').innerText = rank;
+            showPage('result');
+        }
+
+        init();
+    </script>
+</body>
+</html>
