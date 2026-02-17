@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>性癖瓶メーカー</title>
+    <title>性癖瓶メーカー - SEIHEKI BIN SHEET</title>
     <style>
         :root { --bg: #fdfbfb; --accent: #ff4d79; --blue: #6366f1; --rule-color: #e63946; --guide-blue: #4361ee; }
         * { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; box-sizing: border-box; }
@@ -44,9 +44,6 @@
         .modal-content { background: white; border-radius: 25px; padding: 25px; width: 100%; max-width: 450px; text-align: center; }
         .modal-guide-img { display: flex; align-items: flex-end; justify-content: center; gap: 15px; margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 15px; }
         .guide-arrow { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: bold; }
-
-        /* 印刷・スクショ時の調整（ボタンを隠す） */
-        @media print { .no-print { display: none !important; } }
     </style>
 </head>
 <body>
@@ -54,7 +51,7 @@
     <div id="setupView" style="width:100%; display:flex; flex-direction:column; align-items:center;">
         <div class="main-title">性癖瓶メーカー</div>
 
-        <div class="box-common no-print">
+        <div class="box-common">
             <span class="box-title">🍾 瓶を選ぶ (<span id="countDisplay" style="color:var(--accent)">0</span>/20)</span>
             <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                 <input type="text" id="customInput" placeholder="自由入力..." style="flex: 1;">
@@ -71,51 +68,61 @@
 
             <div class="selector-footer">
                 <button class="btn-mini" onclick="clearAllItems()" style="background:#bbb;">全解除</button>
-                <button class="btn-mini" onclick="randomSelect()" style="background:var(--guide-blue);">20個ランダム</button>
+                <button class="btn-mini" onclick="randomSelect()" style="background:var(--guide-blue);">ランダムに20個選ぶ</button>
             </div>
         </div>
 
-        <div class="box-common guide-box no-print">
-            <span class="box-title">〜 遊び方 〜</span>
-            <div style="font-size: 0.8rem; line-height: 1.6; color: var(--guide-blue); font-weight: bold; text-align: center;">
-                1. 瓶を選んで、中身を注ぐ<br>
-                2. 完成したら画面をスクショ！<br>
-                3. SNSや友達に画像をシェアしよう
+        <div class="box-common guide-box">
+            <span class="box-title">〜 使い方 〜</span>
+            <div style="font-size: 0.8rem; line-height: 1.8; color: var(--guide-blue); font-weight: bold; text-align: center;">
+                1. 瓶を最大20個選ぶ（自由入力・名称変更OK）<br>
+                2. 下の瓶に「色」と「量」を注ぐ<br>
+                3. 完成したらスクリーンショットで保存！
             </div>
-            <button class="btn-mini" onclick="toggleModal(true)" style="width:100%; margin-top:12px; background:var(--rule-color); height:40px; font-size:0.85rem;">ルール・図解を見る</button>
+            <button class="btn-mini" onclick="toggleModal(true)" style="width:100%; margin-top:12px; background:var(--rule-color); height:40px; font-size:0.85rem;">色のルール・図解を見る</button>
         </div>
 
         <div class="container" id="bottleContainer"></div>
-        
-        <p class="no-print" style="font-size: 0.7rem; color: #999; margin: 20px 0;">
-            ※このツールはURLを発行しません。スクショを保存して遊んでください。
-        </p>
     </div>
 
     <div class="modal-overlay" id="ruleModal" onclick="toggleModal(false)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3 style="color:var(--rule-color); margin-top:0;">性癖瓶の注ぎ方</h3>
+            
             <div class="modal-guide-img">
-                <div class="guide-arrow"><span style="color:var(--accent)">好き！</span><div style="font-size:1.5rem;">↑</div></div>
-                <div class="bottle-frame" style="margin:0; width:55px; height:80px; border-width:2px;"><div class="liquid" style="height:70%; background:var(--accent); opacity:0.8;"></div></div>
-                <div class="bottle-frame" style="margin:0; width:55px; height:80px; border-width:2px;"><div class="liquid" style="height:40%; background:var(--blue); opacity:0.8;"></div></div>
-                <div class="guide-arrow"><span style="color:var(--blue)">苦手…</span><div style="font-size:1.5rem;">↑</div></div>
+                <div class="guide-arrow">
+                    <span style="color:var(--accent)">好き！</span>
+                    <div style="font-size:1.5rem;">↑</div>
+                </div>
+                <div class="bottle-frame" style="margin:0; width:55px; height:80px; border-width:2px;">
+                    <div class="liquid" style="height:70%; background:var(--accent); opacity:0.8;"></div>
+                </div>
+                <div class="bottle-frame" style="margin:0; width:55px; height:80px; border-width:2px;">
+                    <div class="liquid" style="height:40%; background:var(--blue); opacity:0.8;"></div>
+                </div>
+                <div class="guide-arrow">
+                    <span style="color:var(--blue)">苦手…</span>
+                    <div style="font-size:1.5rem;">↑</div>
+                </div>
             </div>
+
             <div style="text-align:left; font-size:0.8rem; line-height:1.6; color:#555;">
-                <p>● <b>色</b>：ピンクは「好き」、ブルーは「苦手・地雷」</p>
-                <p>● <b>量</b>：多いほど、その感情（好き/苦手）が強い</p>
+                <p>● <b>色（属性）</b>：ピンクは「好き」、ブルーは「苦手・地雷」を指します。</p>
+                <p>● <b>量（熱量）</b>：1%〜100%で注ぎます。量が多いほど、その感情が強いことを示します。</p>
+                <p>● <b>コメント</b>：瓶の下の欄に自分のこだわりを自由に書けます。</p>
             </div>
-            <button class="btn-mini" style="width:100%; height:45px; margin-top:20px; background:#333; font-size:1rem;" onclick="toggleModal(false)">OK！</button>
+            
+            <button class="btn-mini" style="width:100%; height:45px; margin:20px 0 0; background:#333; font-size:1rem;" onclick="toggleModal(false)">OK！理解した</button>
         </div>
     </div>
 
     <script>
         const PRESET_DATA = [
-            {id:'pre-1', items:['長身','小柄','日焼け','褐色','貧乳','巨乳','お尻','手','太もも','おへそ','背中']}, 
-            {id:'pre-2', items:['ショート','ロング','ボブ','ポニテ','ツインテ','お団子','ぱっつん','三つ編み']}, 
-            {id:'pre-3', items:['体格差','主従関係','密室','コスプレ','先生と生徒','NTR','幼馴染','同い年','制服']}, 
-            {id:'pre-4', items:['ロリ','ショタ','お姉さん','妹','ギャル','メスガキ','清楚','無口','地雷系','ツンデレ','男の娘','眼鏡女子']}, 
-            {id:'pre-5', items:['汗','囁き','耳攻め','命令','催眠','目隠し','緊縛','放置','M','S','キス','ハグ']} 
+            {id:'pre-1', items:['長身','小柄','モデル体型','日焼け','褐色','貧乳・微乳','巨乳','お尻','手','生足・太もも','おへそ','背中','そばかす']}, 
+            {id:'pre-2', items:['ショートヘア','ロングヘア','ボブヘア','ポニーテール','ツインテール','お団子ヘア','ウルフカット','インナーカラー','ぱっつん','三つ編み','シースルーバング','デコ出し']}, 
+            {id:'pre-3', items:['体格差','主従関係','密室','コスプレ','お漏らし','先生と生徒','NTR','野外・露出','幼馴染','同い年','背徳感','制服']}, 
+            {id:'pre-4', items:['ロリ','ショタ','お姉さん','妹・姉','ギャル','メスガキ','清楚','清楚ビッチ','無口','クーデレ','地雷系','TS','ツンデレ','天然・ドジっ子','小悪魔','ギャップ萌え','外国人・ハーフ','男の娘','眼鏡女子','オタク女子','強気・男勝り','スポーツ女子','高学歴女子','一人称名前']}, 
+            {id:'pre-5', items:['ローション・オイル','汗','あくび','くしゃみ','焦らし','指舐め','声','囁き・耳攻め','首絞め','命令','催眠','目隠し','緊縛','放置','拘束','M','S','キス','ハグ']} 
         ];
         const COLORS = { pink: '#ff5d8f', blue: '#6366f1' };
         let selectedItems = [];
@@ -179,19 +186,19 @@
                 const card = document.createElement('div');
                 card.className = 'bottle-card';
                 card.innerHTML = `
-                    <div class="del-btn no-print" onclick="removeItem(${i})">×</div>
+                    <div class="del-btn" onclick="removeItem(${i})">×</div>
                     <input type="text" class="bottle-name-edit" value="${b.name}" onchange="updateName(${i}, this.value)">
-                    <div style="display:flex; justify-content:center; gap:12px; margin-bottom:5px;" class="no-print">
+                    <div style="display:flex; justify-content:center; gap:12px; margin-bottom:5px;">
                         <div style="width:18px;height:18px;border-radius:50%;background:${COLORS.pink};border:${b.color===COLORS.pink?'3px solid #333':'none'}" onclick="updateColor(${i},'pink')"></div>
                         <div style="width:18px;height:18px;border-radius:50%;background:${COLORS.blue};border:${b.color===COLORS.blue?'3px solid #333':'none'}" onclick="updateColor(${i},'blue')"></div>
                     </div>
                     <div class="bottle-frame"><div id="liq-${i}" class="liquid" style="height:${b.level}%; background:${b.color}; opacity:0.8;"></div></div>
-                    <div style="display:flex; align-items:center; justify-content:center; gap:8px;" class="no-print">
-                        <button class="p-btn" onmousedown="startPress(${i},-5)" ontouchstart="startPress(${i},-5)" onmouseup="stopPress()" ontouchend="stopPress()" onmouseleave="stopPress()">−</button>
+                    <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+                        <button class="p-btn" onmousedown="startPress(${i},-2)" ontouchstart="startPress(${i},-2)" onmouseup="stopPress()" ontouchend="stopPress()" onmouseleave="stopPress()">−</button>
                         <span id="lv-${i}" style="font-size:0.85rem; font-weight:bold; width:35px;">${b.level}%</span>
-                        <button class="p-btn" onmousedown="startPress(${i},5)" ontouchstart="startPress(${i},5)" onmouseup="stopPress()" ontouchend="stopPress()" onmouseleave="stopPress()">+</button>
+                        <button class="p-btn" onmousedown="startPress(${i},2)" ontouchstart="startPress(${i},2)" onmouseup="stopPress()" ontouchend="stopPress()" onmouseleave="stopPress()">+</button>
                     </div>
-                    <textarea class="comment-area" placeholder="解説..." onchange="updateNote(${i}, this.value)">${b.note || ''}</textarea>
+                    <textarea class="comment-area" placeholder="解説(任意)..." onchange="updateNote(${i}, this.value)">${b.note || ''}</textarea>
                 `;
                 container.appendChild(card);
             });
@@ -200,12 +207,12 @@
         function startPress(i, dir) {
             stopPress();
             updateStep(i, dir);
-            pressTimer = setInterval(() => updateStep(i, dir), 80);
+            pressTimer = setInterval(() => updateStep(i, dir), 60);
         }
         function stopPress() { clearInterval(pressTimer); }
         function updateStep(i, dir) {
             let next = selectedItems[i].level + dir;
-            if (next < 0) next = 0;
+            if (next < 1) next = 1;
             if (next > 100) next = 100;
             selectedItems[i].level = next;
             document.getElementById(`liq-${i}`).style.height = next + '%';
@@ -215,6 +222,7 @@
         function updateName(i, v) { selectedItems[i].name = v; }
         function updateNote(i, v) { selectedItems[i].note = v; }
         function updateColor(i, type) { selectedItems[i].color = COLORS[type]; renderBottles(); }
+        
         function removeItem(i) { 
             const name = selectedItems[i].name;
             selectedItems.splice(i, 1); 
@@ -223,7 +231,7 @@
         }
         function toggleModal(s) { document.getElementById('ruleModal').style.display = s ? 'flex' : 'none'; }
 
-        init();
+        window.onload = init;
     </script>
 </body>
 </html>
