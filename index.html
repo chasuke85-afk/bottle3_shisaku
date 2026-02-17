@@ -11,7 +11,6 @@
 
         body { font-family: sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 0; color: #444; margin: 0; padding-top: 60px; }
         
-        /* ナビ */
         .g-nav { position: fixed; top: 0; width: 100%; height: 50px; background: #fff; display: flex; border-bottom: 1px solid #eee; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; color: #aaa; cursor: pointer; }
         .nav-item.active { color: var(--accent); border-bottom: 3px solid var(--accent); background: #fffafa; }
@@ -21,6 +20,11 @@
         .box-common { width: 94%; max-width: 500px; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: white; }
         .box-title { font-size: 0.9rem; font-weight: bold; text-align: center; margin-bottom: 10px; display: block; }
 
+        /* 発行URL表示エリア (ここを強化) */
+        #urlDisplayArea { display: none; margin-top: 10px; padding: 15px; background: #fff0f3; border: 2px dashed var(--accent); border-radius: 12px; width: 94%; max-width: 500px; text-align: center; }
+        #urlText { background: white; padding: 10px; border: 1px solid #ddd; border-radius: 5px; word-break: break-all; font-size: 0.7rem; user-select: all; -webkit-user-select: all; margin: 10px 0; max-height: 80px; overflow-y: auto; color: #888; }
+        .copy-trigger { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 80%; margin: 5px 0; box-shadow: 0 4px 10px rgba(255, 77, 121, 0.3); }
+
         /* 項目選択 */
         .preset-scroll { max-height: 250px; overflow-y: auto; padding: 5px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
         .preset-label { font-size: 0.75rem; font-weight: bold; color: #777; margin: 10px 0 5px 5px; border-left: 3px solid #ccc; padding-left: 5px; }
@@ -29,7 +33,7 @@
         .chip.selected { background: var(--accent); color: white; }
         .selector-footer { display: flex; justify-content: space-between; margin-top: 10px; }
 
-        /* 瓶エリア */
+        /* 瓶 */
         .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 96%; max-width: 800px; padding-bottom: 20px; }
         .bottle-card { background: white; border-radius: 18px; padding: 15px 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.07); text-align: center; position: relative; border: 1px solid #f0f0f0; }
         .bottle-name-edit { width: 90%; font-size: 0.85rem; font-weight: bold; text-align: center; margin-bottom: 8px; border: 1px dashed #ccc; background: #fff; padding: 4px; }
@@ -41,10 +45,6 @@
 
         .btn-main { background: var(--accent); color: white; width: 90%; max-width: 350px; margin: 30px 0; font-size: 1.1rem; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; height: 55px; box-shadow: 0 5px 20px rgba(255, 77, 121, 0.4); }
         .btn-mini { font-size: 0.7rem; padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; background: #666; color: white; }
-
-        /* 発行URL表示エリア */
-        #urlDisplayArea { display: none; margin-top: 10px; padding: 15px; background: #fff0f3; border: 2px dashed var(--accent); border-radius: 12px; width: 94%; max-width: 500px; text-align: center; }
-        #urlText { background: white; padding: 10px; border: 1px solid #ddd; border-radius: 5px; word-break: break-all; font-size: 0.8rem; user-select: all; -webkit-user-select: all; margin: 10px 0; }
 
         #resultArea { display: none; width: 94%; max-width: 600px; background: white; border-radius: 20px; padding: 25px; text-align: center; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
     </style>
@@ -60,9 +60,10 @@
         <div class="main-title" id="pageTitle">性癖瓶クイズ作成中</div>
 
         <div id="urlDisplayArea">
-            <span style="font-weight:bold; color:var(--accent);">＼リンクができました！／</span><br>
+            <span style="font-weight:bold; color:var(--accent);">＼リンクが完成しました！／</span><br>
             <div id="urlText"></div>
-            <p style="font-size:0.7rem; color:#666; margin:0;">上のリンクを長押しコピーして友達に送ってね！</p>
+            <button class="copy-trigger" id="copyBtn" onclick="copyAction()">URLをコピーする</button>
+            <p style="font-size:0.6rem; color:#888; margin-top:5px;">うまくコピーできない場合は上の枠内を長押ししてね</p>
         </div>
 
         <div class="box-common" id="selectorBox">
@@ -80,7 +81,7 @@
             </div>
             <div class="selector-footer">
                 <button class="btn-mini" onclick="clearAllItems()" style="background:#bbb;">全解除</button>
-                <button class="btn-mini" onclick="randomSelect()" style="background:var(--guide-blue);">ランダムに20個</button>
+                <button class="btn-mini" onclick="randomSelect()" style="background:var(--guide-blue);">ランダム20個</button>
             </div>
         </div>
 
@@ -96,48 +97,34 @@
 
     <script>
         const PRESET_DATA = [
-            {id:'pre-1', items:['長身','小柄','モデル体型','日焼け','褐色','貧乳','巨乳','お尻','手','太もも','おへそ']}, 
-            {id:'pre-2', items:['ショート','ロング','ボブ','ポニテ','ツインテ','お団子','インナーカラー']}, 
-            {id:'pre-3', items:['体格差','主従関係','密室','コスプレ','先生と生徒','幼馴染','同い年','制服']}, 
-            {id:'pre-4', items:['ロリ','ショタ','お姉さん','妹','ギャル','メスガキ','清楚','無口','クーデレ','地雷系','ツンデレ']}, 
-            {id:'pre-5', items:['汗','あくび','指舐め','囁き','首絞め','命令','緊縛','M','S','キス','ハグ']} 
+            {id:'pre-1', items:['長身','小柄','褐色','貧乳','巨乳','お尻','手','太もも','おへそ']}, 
+            {id:'pre-2', items:['ショート','ロング','ポニテ','ツインテ','お団子']}, 
+            {id:'pre-3', items:['体格差','主従','密室','先生と生徒','幼馴染','制服']}, 
+            {id:'pre-4', items:['ロリ','お姉さん','妹','ギャル','メスガキ','清楚','地雷系','ツンデレ']}, 
+            {id:'pre-5', items:['汗','囁き','首絞め','命令','緊縛','M','S','キス','ハグ']} 
         ];
         const COLORS = { pink: '#ff5d8f', blue: '#6366f1' };
         let selectedItems = [];
         let pressTimer = null;
         let quizData = null;
+        let currentGeneratedUrl = "";
 
-        // 保存・読み込み機能
-        function saveData() {
-            localStorage.setItem('seiheki_draft', JSON.stringify(selectedItems));
-        }
-        function loadData() {
-            const saved = localStorage.getItem('seiheki_draft');
-            return saved ? JSON.parse(saved) : [];
-        }
-        function resetAndHome() {
-            localStorage.removeItem('seiheki_draft');
-            location.href = window.location.origin + window.location.pathname;
-        }
+        function saveData() { localStorage.setItem('seiheki_draft', JSON.stringify(selectedItems)); }
+        function loadData() { const saved = localStorage.getItem('seiheki_draft'); return saved ? JSON.parse(saved) : []; }
+        function resetAndHome() { localStorage.removeItem('seiheki_draft'); location.href = window.location.origin + window.location.pathname; }
 
         function init() {
             PRESET_DATA.forEach(group => {
                 const el = document.getElementById(group.id);
                 group.items.forEach(name => {
                     const chip = document.createElement('div');
-                    chip.className = 'chip';
-                    chip.innerText = name;
-                    chip.id = 'chip-' + name;
+                    chip.className = 'chip'; chip.innerText = name; chip.id = 'chip-' + name;
                     chip.onclick = () => toggleItem(name);
                     el.appendChild(chip);
                 });
             });
-            
-            // 保存データの復元
             selectedItems = loadData();
-            selectedItems.forEach(item => {
-                document.getElementById('chip-' + item.name)?.classList.add('selected');
-            });
+            selectedItems.forEach(item => { document.getElementById('chip-' + item.name)?.classList.add('selected'); });
             renderBottles();
         }
 
@@ -151,34 +138,19 @@
                 selectedItems.push({ name: name, color: 'pink', level: 10, note: '' });
                 document.getElementById('chip-' + name)?.classList.add('selected');
             }
-            saveData();
-            renderBottles();
+            saveData(); renderBottles();
         }
 
         function addCustomItem() {
             const val = document.getElementById('customInput').value.trim();
-            if (!val) return;
-            if (selectedItems.length >= 20) return alert("上限20個です！");
+            if (!val || selectedItems.length >= 20) return;
             selectedItems.push({ name: val, color: 'pink', level: 10, note: '' });
             document.getElementById('customInput').value = '';
-            saveData();
-            renderBottles();
+            saveData(); renderBottles();
         }
 
-        function clearAllItems() {
-            if(!confirm("すべて解除しますか？")) return;
-            selectedItems = [];
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-            saveData();
-            renderBottles();
-        }
-
-        function randomSelect() {
-            clearAllItems();
-            const all = PRESET_DATA.flatMap(g => g.items);
-            const shuffled = all.sort(() => 0.5 - Math.random()).slice(0, 20);
-            shuffled.forEach(n => toggleItem(n));
-        }
+        function clearAllItems() { if(confirm("消去しますか？")){ selectedItems=[]; document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected')); saveData(); renderBottles(); } }
+        function randomSelect() { clearAllItems(); const all = PRESET_DATA.flatMap(g=>g.items); all.sort(()=>0.5-Math.random()).slice(0,12).forEach(n=>toggleItem(n)); }
 
         function renderBottles() {
             document.getElementById('countDisplay').innerText = selectedItems.length;
@@ -219,33 +191,42 @@
         function updateName(i, v) { selectedItems[i].name = v; saveData(); }
         function updateNote(i, v) { selectedItems[i].note = v; saveData(); }
         function updateColor(i, type) { selectedItems[i].color = type; saveData(); renderBottles(); }
-        function removeItem(i) { 
-            const name = selectedItems[i].name;
-            selectedItems.splice(i, 1);
-            document.querySelectorAll('.chip').forEach(c => { if(c.innerText === name) c.classList.remove('selected'); });
-            saveData();
-            renderBottles(); 
-        }
+        function removeItem(i) { const name = selectedItems[i].name; selectedItems.splice(i, 1); document.querySelectorAll('.chip').forEach(c => { if(c.innerText === name) c.classList.remove('selected'); }); saveData(); renderBottles(); }
 
+        // クイズ発行とコピー
         function publishQuiz() {
-            if (selectedItems.length === 0) return alert("瓶を1つ以上選んでください！");
-            const pw = prompt("パスワードを決めてください（回答者が入力します）");
+            if (selectedItems.length === 0) return alert("瓶を選んでね");
+            const pw = prompt("パスワードを決めてね");
             if (!pw) return;
             
             const dataObj = { p: pw, b: selectedItems };
             const jsonStr = JSON.stringify(dataObj);
             const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
-            const url = window.location.origin + window.location.pathname + '?q=' + base64Data;
+            currentGeneratedUrl = window.location.origin + window.location.pathname + '?q=' + base64Data;
             
-            // 画面に表示（最優先）
-            document.getElementById('urlText').innerText = url;
+            document.getElementById('urlText').innerText = currentGeneratedUrl;
             document.getElementById('urlDisplayArea').style.display = 'block';
+            document.getElementById('copyBtn').innerText = "URLをコピーする";
+            document.getElementById('copyBtn').style.background = "var(--accent)";
             window.scrollTo(0,0);
+        }
 
-            // クリップボードへのコピー試行
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(url).then(() => alert("リンクをコピーしました！"));
+        function copyAction() {
+            const btn = document.getElementById('copyBtn');
+            const textArea = document.createElement("textarea");
+            textArea.value = currentGeneratedUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                btn.innerText = "コピー完了！";
+                btn.style.background = "#4caf50";
+                alert("コピーしました！LINE等に貼り付けて送ってね。");
+            } catch (err) {
+                alert("ブラウザの制限で自動コピーに失敗しました。URL枠内を直接長押ししてコピーしてください！");
             }
+            document.body.removeChild(textArea);
         }
 
         window.onload = () => {
@@ -255,12 +236,8 @@
                     const decodedJson = decodeURIComponent(escape(atob(q)));
                     quizData = JSON.parse(decodedJson);
                     startSolveMode();
-                } catch(e) {
-                    init();
-                }
-            } else {
-                init();
-            }
+                } catch(e) { init(); }
+            } else { init(); }
         };
 
         function startSolveMode() {
