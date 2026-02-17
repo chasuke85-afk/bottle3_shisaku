@@ -27,7 +27,7 @@
         .selector-footer { display: flex; justify-content: space-between; margin-top: 10px; }
 
         /* 瓶エリア */
-        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 96%; max-width: 800px; padding-bottom: 20px; }
+        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 96%; max-width: 800px; padding-bottom: 40px; }
         .bottle-card { background: white; border-radius: 18px; padding: 15px 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.07); text-align: center; position: relative; border: 1px solid #f0f0f0; }
         .bottle-name-edit { width: 90%; font-size: 0.85rem; font-weight: bold; text-align: center; margin-bottom: 8px; border: 1px dashed #ccc; background: #fff; padding: 4px; }
         .bottle-frame { width: 65px; height: 100px; border: 3px solid #333; border-radius: 4px 4px 22px 22px; margin: 12px auto; position: relative; overflow: hidden; background: #f0f0f0; }
@@ -42,8 +42,6 @@
         /* モーダル */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; overflow-y: auto; }
         .modal-content { background: white; border-radius: 25px; padding: 25px; width: 100%; max-width: 450px; text-align: center; }
-        .modal-guide-img { display: flex; align-items: flex-end; justify-content: center; gap: 15px; margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 15px; }
-        .guide-arrow { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -75,7 +73,7 @@
         <div class="box-common guide-box">
             <span class="box-title">〜 使い方 〜</span>
             <div style="font-size: 0.8rem; line-height: 1.8; color: var(--guide-blue); font-weight: bold; text-align: center;">
-                1. 瓶を最大20個選ぶ（自由入力・名称変更OK）<br>
+                1. 瓶を最大20個選ぶ（自動保存されます）<br>
                 2. 下の瓶に「色」と「量」を注ぐ<br>
                 3. 完成したらスクリーンショットで保存！
             </div>
@@ -88,31 +86,8 @@
     <div class="modal-overlay" id="ruleModal" onclick="toggleModal(false)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3 style="color:var(--rule-color); margin-top:0;">性癖瓶の注ぎ方</h3>
-            
-            <div class="modal-guide-img">
-                <div class="guide-arrow">
-                    <span style="color:var(--accent)">好き！</span>
-                    <div style="font-size:1.5rem;">↑</div>
-                </div>
-                <div class="bottle-frame" style="margin:0; width:55px; height:80px; border-width:2px;">
-                    <div class="liquid" style="height:70%; background:var(--accent); opacity:0.8;"></div>
-                </div>
-                <div class="bottle-frame" style="margin:0; width:55px; height:80px; border-width:2px;">
-                    <div class="liquid" style="height:40%; background:var(--blue); opacity:0.8;"></div>
-                </div>
-                <div class="guide-arrow">
-                    <span style="color:var(--blue)">苦手…</span>
-                    <div style="font-size:1.5rem;">↑</div>
-                </div>
-            </div>
-
-            <div style="text-align:left; font-size:0.8rem; line-height:1.6; color:#555;">
-                <p>● <b>色（属性）</b>：ピンクは「好き」、ブルーは「苦手・地雷」を指します。</p>
-                <p>● <b>量（熱量）</b>：1%〜100%で注ぎます。量が多いほど、その感情が強いことを示します。</p>
-                <p>● <b>コメント</b>：瓶の下の欄に自分のこだわりを自由に書けます。</p>
-            </div>
-            
-            <button class="btn-mini" style="width:100%; height:45px; margin:20px 0 0; background:#333; font-size:1rem;" onclick="toggleModal(false)">OK！理解した</button>
+            <p style="font-size:0.8rem; text-align:left;">● ピンクは「好き」、ブルーは「苦手」<br>● 量が多いほどその感情が強い証です</p>
+            <button class="btn-mini" style="width:100%; height:45px; background:#333; font-size:1rem;" onclick="toggleModal(false)">OK</button>
         </div>
     </div>
 
@@ -128,6 +103,17 @@
         let selectedItems = [];
         let pressTimer = null;
 
+        // 保存と読み込み
+        function saveToLocal() { localStorage.setItem('seiheki_data', JSON.stringify(selectedItems)); }
+        function loadFromLocal() {
+            const saved = localStorage.getItem('seiheki_data');
+            if (saved) {
+                selectedItems = JSON.parse(saved);
+                updateChips();
+                renderBottles();
+            }
+        }
+
         function init() {
             PRESET_DATA.forEach(group => {
                 const el = document.getElementById(group.id);
@@ -140,42 +126,54 @@
                     el.appendChild(chip);
                 });
             });
-            renderBottles();
+            loadFromLocal();
+        }
+
+        function updateChips() {
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+            selectedItems.forEach(item => {
+                const chip = document.getElementById('chip-' + item.name);
+                if (chip) chip.classList.add('selected');
+            });
         }
 
         function toggleItem(name) {
             const idx = selectedItems.findIndex(i => i.name === name);
             if (idx > -1) {
                 selectedItems.splice(idx, 1);
-                document.getElementById('chip-' + name)?.classList.remove('selected');
             } else {
                 if (selectedItems.length >= 20) return alert("上限20個です！");
                 selectedItems.push({ name: name, color: COLORS.pink, level: 50, note: '' });
-                document.getElementById('chip-' + name)?.classList.add('selected');
             }
+            updateChips();
             renderBottles();
+            saveToLocal();
         }
 
         function addCustomItem() {
             const val = document.getElementById('customInput').value.trim();
-            if (!val) return;
-            if (selectedItems.length >= 20) return alert("上限20個です！");
+            if (!val || selectedItems.length >= 20) return;
             selectedItems.push({ name: val, color: COLORS.pink, level: 50, note: '' });
             document.getElementById('customInput').value = '';
             renderBottles();
+            saveToLocal();
         }
 
         function clearAllItems() {
+            if(!confirm("すべて削除しますか？")) return;
             selectedItems = [];
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+            updateChips();
             renderBottles();
+            saveToLocal();
         }
 
         function randomSelect() {
-            clearAllItems();
             const all = PRESET_DATA.flatMap(g => g.items);
             const shuffled = all.sort(() => 0.5 - Math.random()).slice(0, 20);
-            shuffled.forEach(n => toggleItem(n));
+            selectedItems = shuffled.map(n => ({ name: n, color: COLORS.pink, level: 50, note: '' }));
+            updateChips();
+            renderBottles();
+            saveToLocal();
         }
 
         function renderBottles() {
@@ -194,41 +192,33 @@
                     </div>
                     <div class="bottle-frame"><div id="liq-${i}" class="liquid" style="height:${b.level}%; background:${b.color}; opacity:0.8;"></div></div>
                     <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
-                        <button class="p-btn" onmousedown="startPress(${i},-2)" ontouchstart="startPress(${i},-2)" onmouseup="stopPress()" ontouchend="stopPress()" onmouseleave="stopPress()">−</button>
+                        <button class="p-btn" onmousedown="startPress(${i},-2)" ontouchstart="startPress(${i},-2)" onmouseup="stopPress()" ontouchend="stopPress()">−</button>
                         <span id="lv-${i}" style="font-size:0.85rem; font-weight:bold; width:35px;">${b.level}%</span>
-                        <button class="p-btn" onmousedown="startPress(${i},2)" ontouchstart="startPress(${i},2)" onmouseup="stopPress()" ontouchend="stopPress()" onmouseleave="stopPress()">+</button>
+                        <button class="p-btn" onmousedown="startPress(${i},2)" ontouchstart="startPress(${i},2)" onmouseup="stopPress()" ontouchend="stopPress()">+</button>
                     </div>
-                    <textarea class="comment-area" placeholder="解説(任意)..." onchange="updateNote(${i}, this.value)">${b.note || ''}</textarea>
+                    <textarea class="comment-area" placeholder="解説..." onchange="updateNote(${i}, this.value)">${b.note || ''}</textarea>
                 `;
                 container.appendChild(card);
             });
         }
 
         function startPress(i, dir) {
-            stopPress();
             updateStep(i, dir);
             pressTimer = setInterval(() => updateStep(i, dir), 60);
         }
-        function stopPress() { clearInterval(pressTimer); }
+        function stopPress() { clearInterval(pressTimer); saveToLocal(); }
         function updateStep(i, dir) {
             let next = selectedItems[i].level + dir;
-            if (next < 1) next = 1;
-            if (next > 100) next = 100;
+            if (next < 1) next = 1; if (next > 100) next = 100;
             selectedItems[i].level = next;
             document.getElementById(`liq-${i}`).style.height = next + '%';
             document.getElementById(`lv-${i}`).innerText = next + '%';
         }
 
-        function updateName(i, v) { selectedItems[i].name = v; }
-        function updateNote(i, v) { selectedItems[i].note = v; }
-        function updateColor(i, type) { selectedItems[i].color = COLORS[type]; renderBottles(); }
-        
-        function removeItem(i) { 
-            const name = selectedItems[i].name;
-            selectedItems.splice(i, 1); 
-            document.getElementById('chip-' + name)?.classList.remove('selected');
-            renderBottles(); 
-        }
+        function updateName(i, v) { selectedItems[i].name = v; saveToLocal(); }
+        function updateNote(i, v) { selectedItems[i].note = v; saveToLocal(); }
+        function updateColor(i, type) { selectedItems[i].color = COLORS[type]; renderBottles(); saveToLocal(); }
+        function removeItem(i) { selectedItems.splice(i, 1); updateChips(); renderBottles(); saveToLocal(); }
         function toggleModal(s) { document.getElementById('ruleModal').style.display = s ? 'flex' : 'none'; }
 
         window.onload = init;
