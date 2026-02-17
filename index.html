@@ -39,6 +39,12 @@
         /* ボタン */
         .btn-mini { font-size: 0.7rem; padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; background: #666; color: white; }
 
+        /* プレビュー表示用 */
+        #previewArea { width: 100%; display: flex; flex-direction: column; align-items: center; padding: 30px 0; background: #eee; margin-top: 30px; }
+        .preview-content { background: var(--bg); padding: 20px; border-radius: 0; width: 100%; max-width: 800px; }
+        .preview-bottle-card { background: white; border-radius: 18px; padding: 15px 10px; text-align: center; border: 1px solid #f0f0f0; }
+        .preview-note { font-size: 0.7rem; color: #666; margin-top: 8px; min-height: 1em; white-space: pre-wrap; }
+
         /* モーダル */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; overflow-y: auto; }
         .modal-content { background: white; border-radius: 25px; padding: 25px; width: 100%; max-width: 450px; text-align: center; }
@@ -83,6 +89,19 @@
         </div>
 
         <div class="container" id="bottleContainer"></div>
+
+        <button onclick="generatePreview()" style="width:94%; max-width:500px; height:50px; background:#333; color:white; border-radius:12px; border:none; font-weight:bold; font-size:1rem; margin: 20px 0; cursor:pointer;">
+            ✨ 完成プレビューを表示する
+        </button>
+    </div>
+
+    <div id="previewArea" style="display:none;">
+        <div style="margin-bottom:15px; color:#666; font-size:0.8rem;">↓このエリアをスクリーンショットして保存↓</div>
+        <div class="preview-content" id="previewTarget">
+            <div class="main-title" style="text-align:center; margin-top:0;">SEIHEKI BIN SHEET</div>
+            <div class="container" id="previewContainer" style="margin:0 auto;"></div>
+        </div>
+        <button class="btn-mini" onclick="document.getElementById('previewArea').style.display='none'" style="margin-top:20px; background:#333; padding:10px 20px;">編集に戻る</button>
     </div>
 
     <div class="modal-overlay" id="ruleModal" onclick="toggleModal(false)">
@@ -128,17 +147,14 @@
         let selectedItems = [];
         let pressTimer = null;
 
-        // 保存用関数
         function saveState() {
             localStorage.setItem('binMakerData', JSON.stringify(selectedItems));
         }
 
-        // 読み込み用関数
         function loadState() {
             const saved = localStorage.getItem('binMakerData');
             if (saved) {
                 selectedItems = JSON.parse(saved);
-                // チップの状態を更新
                 selectedItems.forEach(item => {
                     const chip = document.getElementById('chip-' + item.name);
                     if (chip) chip.classList.add('selected');
@@ -159,7 +175,7 @@
                     el.appendChild(chip);
                 });
             });
-            loadState(); // 初期化時に読み込み
+            loadState();
         }
 
         function toggleItem(name) {
@@ -226,6 +242,28 @@
             });
         }
 
+        // プレビュー生成機能
+        function generatePreview() {
+            if (selectedItems.length === 0) return alert("瓶を1つ以上選んでください！");
+            const pContainer = document.getElementById('previewContainer');
+            pContainer.innerHTML = '';
+            
+            selectedItems.forEach(b => {
+                const card = document.createElement('div');
+                card.className = 'preview-bottle-card';
+                card.innerHTML = `
+                    <div style="font-size:0.85rem; font-weight:bold; margin-bottom:8px;">${b.name}</div>
+                    <div class="bottle-frame" style="margin:5px auto;"><div class="liquid" style="height:${b.level}%; background:${b.color}; opacity:0.8;"></div></div>
+                    <div style="font-size:0.75rem; font-weight:bold; color:#666;">${b.level}%</div>
+                    <div class="preview-note">${b.note || ''}</div>
+                `;
+                pContainer.appendChild(card);
+            });
+
+            document.getElementById('previewArea').style.display = 'flex';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
         function startPress(i, dir) {
             stopPress();
             updateStep(i, dir);
@@ -233,7 +271,7 @@
         }
         function stopPress() { 
             clearInterval(pressTimer); 
-            saveState(); // 離した瞬間に保存
+            saveState();
         }
         function updateStep(i, dir) {
             let next = selectedItems[i].level + dir;
