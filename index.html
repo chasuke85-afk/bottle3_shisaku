@@ -3,173 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>性癖瓶 Ver.12.1 - Quiz Ready</title>
+    <title>性癖瓶クイズ - SEIHEKI BIN QUIZ</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
-        :root { --bg: #fdfbfb; --accent: #ff4d79; --rule-color: #e63946; --sub-bg: #fff; }
+        :root { --bg: #fdfbfb; --accent: #ff4d79; --blue: #6366f1; --rule-color: #e63946; --guide-blue: #4361ee; }
         * { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; box-sizing: border-box; }
         input[type="text"] { -webkit-user-select: text; user-select: text; }
 
-        body { font-family: sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 15px; color: #444; margin: 0; }
-        .main-title { font-size: 1.6rem; font-weight: bold; margin: 20px 0 10px 0; color: #333; letter-spacing: 2px; }
-
-        .mode-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab-btn { padding: 6px 18px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; border: 2px solid #ddd; color: #aaa; transition: 0.3s; background: white; }
-        .tab-btn.active { border-color: var(--accent); color: var(--accent); background: #fff0f3; }
-
-        /* --- 赤枠内のデザイン --- */
-        .rule-box { border: 2px solid var(--rule-color); background: #fff5f5; border-radius: 12px; padding: 15px; margin-bottom: 10px; max-width: 500px; width: 95%; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .rule-box h2 { margin: 0 0 15px 0; font-size: 1rem; color: var(--rule-color); text-align: center; border-bottom: 1px dashed var(--rule-color); padding-bottom: 8px; }
+        body { font-family: sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 0; color: #444; margin: 0; padding-top: 60px; }
         
-        .color-guide { display: flex; justify-content: center; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
-        .guide-item { display: flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: bold; }
-        .color-chip { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.1); }
+        /* ナビゲーション */
+        .g-nav { position: fixed; top: 0; width: 100%; height: 50px; background: #fff; display: flex; border-bottom: 1px solid #eee; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; color: #aaa; cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); border-bottom: 3px solid var(--accent); background: #fffafa; }
+
+        .main-title { font-size: 1.4rem; font-weight: bold; margin: 20px 0; letter-spacing: 1px; color: #333; }
+
+        /* ボックス共通 */
+        .box-common { width: 92%; max-width: 500px; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .box-title { font-size: 0.9rem; font-weight: bold; text-align: center; margin-bottom: 10px; display: block; }
         
-        .rule-item-container { display: flex; flex-direction: column; align-items: center; }
-        .rule-sub-title { display: block; padding: 2px 12px; background: var(--sub-bg); color: #666; font-size: 0.7rem; font-weight: bold; border-radius: 4px; border: 1px solid #ddd; margin-top: 12px; cursor: default; }
-        .rule-text { font-size: 0.75rem; color: #555; text-align: center; line-height: 1.6; margin-bottom: 5px; margin-top: 5px; }
+        .rule-box { border: 2px solid var(--rule-color); background: #fff5f5; }
+        .rule-box .box-title { color: var(--rule-color); }
+        
+        .guide-box { border: 2px solid var(--guide-blue); background: #f5f8ff; }
+        .guide-box .box-title { color: var(--guide-blue); }
 
-        /* 特別なジャンプボタン */
-        .jump-preview-btn {
-            margin-top: 15px; padding: 10px 20px;
-            background: linear-gradient(135deg, #ff4d79, #ff7597);
-            color: white; font-size: 0.8rem; font-weight: bold; border-radius: 30px;
-            cursor: pointer; box-shadow: 0 4px 15px rgba(255, 77, 121, 0.3);
-            transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; border: none;
-        }
-        .jump-preview-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 77, 121, 0.4); filter: brightness(1.1); }
-        .jump-preview-btn:active { transform: translateY(1px); }
+        /* モーダル */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: white; border-radius: 20px; padding: 25px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .visual-guide { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 20px 0; background: #f9f9f9; padding: 10px; border-radius: 10px; border: 1px solid #eee; }
+        .v-bar { height: 30px; display: flex; align-items: center; color: white; font-size: 0.6rem; font-weight: bold; padding: 0 5px; }
 
-        .warning-note { color: var(--rule-color); font-weight: bold; font-size: 0.7rem; text-align: center; margin-top: 15px; display: block; border-top: 1px solid #eee; padding-top: 10px; }
-
-        /* --- ボトルエリア --- */
-        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 900px; margin-top: 20px; }
-        @media (min-width: 600px) { .container { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; } }
-
+        /* ボトルエリア */
+        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 95%; max-width: 900px; }
         .bottle-card { background: white; border-radius: 15px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; position: relative; }
-        .drag-handle { position: absolute; top: 12px; left: 10px; cursor: grab; font-size: 1.2rem; color: #ddd; z-index: 10; }
-        .lock-btn { position: absolute; top: 8px; right: 8px; cursor: pointer; font-size: 1.2rem; color: #ccc; z-index: 10; }
-
-        input[type="text"] { width: 90%; border: none; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 0.85rem; background: transparent; margin: 15px 0 5px 0; color: #333 !important; }
-        .memo-input { width: 90% !important; border: none !important; font-size: 0.65rem !important; color: #888 !important; text-align: center !important; background: #f9f9f9 !important; border-radius: 4px; padding: 4px !important; margin-bottom: 8px !important; }
-
-        .bottle-frame { width: 60px; height: 90px; border: 3px solid #333; border-radius: 2px 2px 20px 20px; margin: 10px auto; position: relative; overflow: hidden; background: #f0f0f0; }
-        .liquid { position: absolute; bottom: 0; width: 100%; transition: height 0.1s linear; will-change: height; }
-
-        .p-btn { width: 35px; height: 35px; border-radius: 50%; border: none; background: #eee; cursor: pointer; font-size: 1.2rem; touch-action: manipulation; }
-        .delete-btn { font-size: 1.1rem; color: #ffbcbc; cursor: pointer; margin-top: 12px; }
-
-        /* --- プリセットカテゴリ --- */
-        .preset-container { margin: 20px 0 60px 0; width: 95%; max-width: 600px; background: rgba(255,255,255,0.7); padding: 20px; border-radius: 20px; border: 1px solid #eee; }
-        .batch-toggle { font-size: 0.7rem; padding: 5px 12px; border-radius: 10px; border: 1px solid #ddd; background: white; cursor: pointer; margin-bottom: 15px; display: block; margin-left: auto; font-weight: bold; }
-        .batch-toggle.active { background: var(--accent); color: white; border-color: var(--accent); }
-        .preset-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
-        .preset-btn { padding: 4px 10px; background: #fff; border-radius: 12px; font-size: 0.65rem; border: 1px solid #ddd; cursor: pointer; }
-        .preset-btn.selected { background: #ffebee; border-color: var(--accent); color: var(--accent); }
-        .preset-label { font-size: 0.75rem; color: #888; margin: 15px 0 8px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; }
-        .preset-label::before, .preset-label::after { content: ""; height: 1px; flex-grow: 1; background: #ddd; }
-
-        .controls { margin: 30px 0 40px 0; display: flex; gap: 10px; }
-        .main-btn { padding: 12px 24px; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; background: #333; color: white; transition: 0.2s; }
+        .bottle-frame { width: 55px; height: 85px; border: 3px solid #333; border-radius: 2px 2px 18px 18px; margin: 10px auto; position: relative; overflow: hidden; background: #eee; }
+        .liquid { position: absolute; bottom: 0; width: 100%; transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .p-btn { width: 35px; height: 35px; border-radius: 50%; border: none; background: #f0f0f0; font-size: 1.2rem; cursor: pointer; touch-action: manipulation; }
         
-        .preview-section { width: 100%; max-width: 900px; margin-top: 50px; padding: 30px 20px; border-top: 2px dashed #eee; text-align: center; }
-        .preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+        /* ボタン */
+        .btn { padding: 10px 20px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-rule { background: var(--rule-color); color: white; font-size: 0.75rem; }
+        .btn-random { background: #555; color: white; margin-bottom: 15px; font-size: 0.8rem; }
+        .btn-main { background: var(--accent); color: white; width: 90%; max-width: 300px; margin: 30px 0; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(255, 77, 121, 0.3); }
+
+        /* 答え合わせ画面 */
+        #resultArea { display: none; width: 95%; max-width: 600px; background: white; border-radius: 20px; padding: 20px; text-align: center; margin-top: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .score-circle { width: 120px; height: 120px; border: 8px solid var(--accent); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 15px; }
+        .score-num { font-size: 2.2rem; font-weight: bold; color: var(--accent); }
+        .diff-tag { font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; background: #eee; margin-top: 5px; }
     </style>
 </head>
-<body oncontextmenu="return false;">
-    <div class="main-title">【あなただけの性癖瓶】</div>
+<body>
 
-    <div class="mode-tabs">
-        <div class="tab-btn active" onclick="setTab(this)">2D / 二次元</div>
-        <div class="tab-btn" onclick="setTab(this)">Real / 現実</div>
-    </div>
+    <nav class="g-nav">
+        <div class="nav-item active" id="nav-make" onclick="location.href=window.location.pathname">クイズを作る</div>
+        <div class="nav-item" id="nav-solve">クイズを当てる</div>
+    </nav>
 
-    <div class="rule-box">
-        <h2>◀︎ 性癖瓶のルール ▶︎</h2>
-        <div class="color-guide">
-            <div class="guide-item"><div class="color-chip" style="background: #ff5d8f;"></div><span>ピンク：好き</span></div>
-            <div class="guide-item"><div class="color-chip" style="background: #6366f1;"></div><span>青色：苦手</span></div>
+    <div id="setupView" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+        <div class="main-title" id="pageTitle">性癖瓶クイズ作成中</div>
+
+        <div class="box-common rule-box">
+            <span class="box-title">◀︎ 性癖瓶のルール ▶︎</span>
+            <div style="display:flex; justify-content:center;">
+                <button class="btn btn-rule" onclick="toggleModal(true)">ルール・判定基準を見る</button>
+            </div>
         </div>
 
-        <div class="rule-item-container">
-            <span class="rule-sub-title">量</span>
-            <p class="rule-text">ボタン長押しで注入。＋－で微調整可。</p>
-
-            <span class="rule-sub-title">こだわり</span>
-            <p class="rule-text">各瓶に一言メモを自由に書き込めます。</p>
-
-            <span class="rule-sub-title">保存・共有</span>
-            <p class="rule-text">下部のプレビューをスクショしてください！</p>
-            
-            <button class="jump-preview-btn" onclick="scrollSection('previewArea')">
-                <span>📸</span> プレビュー・URL保存へジャンプ
-            </button>
+        <div class="box-common guide-box" id="guideBox">
+            <span class="box-title">〜 クイズ発行までの流れ 〜</span>
+            <div style="font-size: 0.75rem; line-height: 1.8; color: var(--guide-blue); font-weight: bold; text-align: center;">
+                1. 🎲ボタンで20個の瓶をセットする<br>
+                2. 自分の性癖を「色」と「量」で注ぐ<br>
+                3. 「クイズを発行」してパスワードを決める
+            </div>
         </div>
 
-        <span class="warning-note">⚠️ 音が出ます。周囲に注意してください。</span>
+        <button class="btn btn-random" onclick="generateRandom20()">🎲 おすすめ20項目をセット</button>
+
+        <div class="container" id="bottleContainer"></div>
+
+        <button class="btn btn-main" id="actionBtn" onclick="publishQuiz()">⚡️ クイズリンクを発行！</button>
     </div>
 
-    <div class="container" id="bottleContainer"></div>
-
-    <div class="controls">
-        <button class="main-btn" style="background:var(--accent)" onclick="addBottle()">自由に追加</button>
-        <button class="main-btn" onclick="generateShareURL(event)">URLをコピー</button>
+    <div id="resultArea">
+        <h2 id="resultTitle">採点結果</h2>
+        <div class="score-circle">
+            <div style="font-size: 0.7rem;">一致率</div>
+            <div class="score-num" id="totalScore">0%</div>
+        </div>
+        <h3 id="rankTitle" style="color: var(--accent); margin-bottom: 20px;">称号：鑑定士</h3>
+        <p id="rankComment" style="font-size: 0.85rem; color: #666; margin-bottom: 30px;"></p>
+        <div id="comparisonList"></div>
+        <button class="btn btn-random" onclick="location.reload()">自分もクイズを作る</button>
     </div>
 
-    <div class="preset-container">
-        <button class="batch-toggle" id="batchBtn" onclick="toggleBatchMode()">複数項目追加する</button>
-        <div class="preset-label">身体・部位</div><div class="preset-group" id="pre-1"></div>
-        <div class="preset-label">髪型</div><div class="preset-group" id="pre-2"></div>
-        <div class="preset-label">関係・シチュ</div><div class="preset-group" id="pre-3"></div>
-        <div class="preset-label">性向・属性</div><div class="preset-group" id="pre-4"></div>
-        <div class="preset-label">行為・行動</div><div class="preset-group" id="pre-5"></div>
-    </div>
-
-    <div class="preview-section" id="previewArea">
-        <div id="captureArea" style="background:#fff; padding:30px 15px; border-radius:20px; display:inline-block; width:100%; box-shadow: 0 0 20px rgba(0,0,0,0.05);">
-            <button class="main-btn" style="background:#666; font-size:0.8rem;" onclick="updatePreview()">プレビューを更新</button><br>
-            <div style="font-size:0.7rem; color:var(--accent); font-weight:bold; margin-top:10px;" id="previewModeTitle">2D / 二次元</div>
-            <div class="preview-grid" id="previewGrid"></div>
-            <div style="font-size:0.5rem; color:#ddd; margin-top:20px;">#性癖瓶 #あなただけの性癖瓶</div>
+    <div class="modal-overlay" id="ruleModal" onclick="toggleModal(false)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 style="margin-top:0;">好きか、嫌いか。😡</h3>
+            <p style="font-size: 0.8rem; color: #666; line-height: 1.6;">
+                日本人の悪い癖「普通」は禁止です！<br>
+                少しでも「良い」と思えば赤、<br>「苦手」なら青を必ず選んでください。
+            </p>
+            <div class="visual-guide">
+                <span style="font-size:0.7rem;">好き</span>
+                <div class="v-bar" style="background:var(--accent); width:50px; border-radius: 5px 0 0 5px;">MAX</div>
+                <div class="v-bar" style="background:var(--accent); width:20px; opacity:0.3;">1%</div>
+                <div style="width:2px; height:40px; background:#333; margin:0 5px;"></div>
+                <div class="v-bar" style="background:var(--blue); width:20px; opacity:0.3;">1%</div>
+                <div class="v-bar" style="background:var(--blue); width:50px; border-radius: 0 5px 5px 0;">MAX</div>
+                <span style="font-size:0.7rem;">苦手</span>
+            </div>
+            <p style="font-size: 0.75rem; font-weight: bold; color: var(--rule-color); margin-bottom: 20px;">
+                ※「空っぽ」の瓶は作れません！😡
+            </p>
+            <button class="btn btn-random" style="width:100%;" onclick="toggleModal(false)">理解しました！</button>
         </div>
     </div>
 
     <script>
-        // グレーを削除し、ピンクと青の2色体制へ
-        const PRESET_COLORS = ['#ff5d8f', '#6366f1'];
-        const PRESETS = [ 
-            {id:'pre-1', items:['長身','小柄','モデル体型','日焼け','褐色','貧乳・微乳','巨乳','お尻','手','生足・太もも','おへそ','背中','そばかす']}, 
-            {id:'pre-2', items:['ショートヘア','ロングヘア','ボブヘア','ポニーテール','ツインテール','お団子ヘア','ウルフカット','インナーカラー','ぱっつん','三つ編み','シースルーバング','デコ出し']}, 
-            {id:'pre-3', items:['体格差','主従関係','密室','コスプレ','お漏らし','先生と生徒','NTR','野外・露出','幼馴染','同い年','背徳感','制服']}, 
-            {id:'pre-4', items:['ロリ','ショタ','お姉さん','妹・姉','ギャル','メスガキ','清楚','清楚ビッチ','無口','クーデレ','地雷系','TS','ツンデレ','天然・ドジっ子','小悪魔','ギャップ萌え','外国人・ハーフ','男の娘','眼鏡女子','オタク女子','強気・男勝り','スポーツ女子','高学歴女子','一人称名前']}, 
-            {id:'pre-5', items:['ローション・オイル','汗','あくび','くしゃみ','焦らし','指舐め','声','囁き・耳攻め','首絞め','命令','催眠','目隠し','緊縛','放置','拘束','M','S','キス','ハグ']} 
-        ];
-
+        const ALL_ITEMS = ['長身','小柄','褐色','巨乳','貧乳','お尻','手','生足','ショートヘア','ロングヘア','ポニーテール','ツインテール','体格差','主従関係','コスプレ','幼馴染','制服','ロリ','お姉さん','ギャル','メスガキ','清楚','無口','ツンデレ','男の娘','眼鏡','ローション','汗','囁き','首絞め','命令','緊縛','M','S','キス','ハグ','ぱっつん','ボブ','ソックス','鎖骨','へそ','背中'];
+        const COLORS = { pink: '#ff5d8f', blue: '#6366f1' };
         let bottles = [];
-        let audioCtx = null;
-        let pressInterval = null;
-        let isBatchMode = false;
-        let selectedPresets = [];
+        let quizData = null; // 出題者の正解データ
+        let isSolveMode = false;
 
-        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        window.addEventListener('touchstart', initAudio, { once: true });
-        window.addEventListener('mousedown', initAudio, { once: true });
+        function toggleModal(show) { document.getElementById('ruleModal').style.display = show ? 'flex' : 'none'; }
 
-        function playSound(freq) {
-            if (!audioCtx) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-        }
-
-        function scrollSection(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        function generateRandom20() {
+            if(!confirm("現在の瓶をリセットして、おすすめ20項目をランダムにセットしますか？")) return;
+            const shuffled = [...ALL_ITEMS].sort(() => 0.5 - Math.random());
+            bottles = shuffled.slice(0, 20).map(name => ({
+                name: name, color: COLORS.pink, level: 10
+            }));
+            render();
         }
 
         function render() {
@@ -177,106 +146,124 @@
             container.innerHTML = '';
             bottles.forEach((b, i) => {
                 const card = document.createElement('div');
-                card.className = `bottle-card`;
+                card.className = 'bottle-card';
                 card.innerHTML = `
-                    <div class="drag-handle">⠿</div>
-                    <div class="lock-btn" onclick="toggleLock(${i})">${b.locked ? '🔒' : '🔓'}</div>
-                    <div class="cap" style="position:absolute; top:${b.locked?3:-15}px; left:50%; transform:translateX(-50%); width:40px; height:12px; background:#444; border-radius:3px; z-index:5; transition:0.3s;"></div>
-                    <input type="text" value="${b.name}" onchange="bottles[${i}].name=this.value; saveToLocal();">
-                    <input type="text" class="memo-input" placeholder="メモ..." value="${b.memo||''}" onchange="bottles[${i}].memo=this.value; saveToLocal();">
-                    <div style="display:flex;justify-content:center;gap:6px;margin-bottom:8px;">
-                        ${PRESET_COLORS.map(c => `<div style="width:16px;height:16px;border-radius:50%;cursor:pointer;background:${c};border:${b.color===c?'2px solid #333':'2px solid transparent'}" onclick="updateColor(${i},'${c}')"></div>`).join('')}
+                    <div style="font-size:0.8rem; font-weight:bold; height:1.2rem; overflow:hidden;">${b.name}</div>
+                    <div style="display:flex; justify-content:center; gap:12px; margin:8px 0;">
+                        <div style="width:18px;height:18px;border-radius:50%;background:${COLORS.pink};border:${b.color===COLORS.pink?'2px solid #333':'none'}" onclick="updateColor(${i},'pink')"></div>
+                        <div style="width:18px;height:18px;border-radius:50%;background:${COLORS.blue};border:${b.color===COLORS.blue?'2px solid #333':'none'}" onclick="updateColor(${i},'blue')"></div>
                     </div>
                     <div class="bottle-frame">
-                        <div class="liquid" style="height:${b.level}%; background:${b.color}; opacity:${b.alpha};"></div>
+                        <div class="liquid" style="height:${b.level}%; background:${b.color}; opacity:0.8;"></div>
                     </div>
-                    <div style="display:flex;align-items:center;justify-content:center;gap:5px;">
-                        <button class="p-btn" onmousedown="startPress(${i},-2)" onmouseup="stopPress()" ontouchstart="startPress(${i},-2)" ontouchend="stopPress()">ー</button>
-                        <span style="font-size:0.75rem;font-weight:bold;width:35px;">${b.level}%</span>
-                        <button class="p-btn" onmousedown="startPress(${i},2)" onmouseup="stopPress()" ontouchstart="startPress(${i},2)" ontouchend="stopPress()">＋</button>
+                    <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+                        <button class="p-btn" onclick="updateLevel(${i},-10)">-</button>
+                        <span style="font-size:0.75rem; font-weight:bold; width:35px;">${b.level}%</span>
+                        <button class="p-btn" onclick="updateLevel(${i},10)">+</button>
                     </div>
-                    ${b.locked ? '' : `<div class="delete-btn" onclick="removeBottle(${i})">🗑️</div>`}
                 `;
                 container.appendChild(card);
             });
-            saveToLocal();
         }
 
-        function startPress(i, d) { 
-            if(bottles[i].locked) return;
-            initAudio(); 
-            pressInterval = setInterval(() => { 
-                bottles[i].level = Math.max(0, Math.min(100, bottles[i].level + d)); 
-                playSound(150 + bottles[i].level); render(); 
-            }, 60); 
-        }
-        function stopPress() { clearInterval(pressInterval); }
-        // 内部的にalphaは維持（透明度は固定値0.8など）
-        function updateAlpha(i, v) { bottles[i].alpha = v; saveToLocal(); render(); }
-        function updateColor(i, c) { if(bottles[i].locked)return; bottles[i].color = c; playSound(400); render(); }
-        function toggleLock(i) { bottles[i].locked = !bottles[i].locked; render(); }
-        function removeBottle(i) { bottles.splice(i,1); render(); }
-        // デフォルトの不透明度を0.8に固定して追加
-        function addBottle() { bottles.push({name:'新項目', memo:'', color:PRESET_COLORS[0], level:0, alpha:0.8, locked:false}); render(); }
-        function saveToLocal() { localStorage.setItem('mySeihekiBin', JSON.stringify(bottles)); }
+        function updateColor(i, type) { bottles[i].color = COLORS[type]; render(); }
+        function updateLevel(i, diff) { bottles[i].level = Math.max(1, Math.min(100, bottles[i].level + diff)); render(); }
 
-        function toggleBatchMode() {
-            isBatchMode = !isBatchMode;
-            const btn = document.getElementById('batchBtn');
-            if(isBatchMode) { btn.innerText = "決定（一括追加）"; btn.classList.add('active'); }
-            else {
-                selectedPresets.forEach(name => bottles.push({name:name, memo:'', color:PRESET_COLORS[0], level:50, alpha:0.8, locked:false}));
-                selectedPresets = []; render(); btn.innerText = "複数項目追加する"; btn.classList.remove('active');
-                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('selected'));
-            }
-        }
-
-        function init() {
-            PRESETS.forEach(cat => {
-                const g = document.getElementById(cat.id);
-                cat.items.forEach(name => {
-                    const b = document.createElement('div'); b.className = 'preset-btn'; b.innerText = name;
-                    b.onclick = () => {
-                        if(isBatchMode) { b.classList.toggle('selected'); if(b.classList.contains('selected')) selectedPresets.push(name); else selectedPresets = selectedPresets.filter(n=>n!==name); }
-                        else { bottles.push({name:name, memo:'', color:PRESET_COLORS[0], level:50, alpha:0.8, locked:false}); render(); }
-                    };
-                    g.appendChild(b);
-                });
+        function publishQuiz() {
+            const pw = prompt("【出題者】回答者が入力するパスワードを決めてください");
+            if(!pw) return;
+            const dataObj = { p: pw, b: bottles };
+            const dataStr = btoa(unescape(encodeURIComponent(JSON.stringify(dataObj))));
+            const url = window.location.origin + window.location.pathname + '?q=' + dataStr;
+            navigator.clipboard.writeText(url).then(() => {
+                alert("クイズリンクをコピーしました！友達に送って当ててもらいましょう。");
             });
-            const saved = localStorage.getItem('mySeihekiBin');
-            if(saved) {
-                bottles = JSON.parse(saved);
-                // 保存データにグレーがあった場合の救済：ピンクに変換
-                bottles.forEach(b => { if(b.color === '#94a3b8') b.color = '#ff5d8f'; });
+        }
+
+        // 初期ロード時の判定
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            const q = params.get('q');
+            if(q) {
+                try {
+                    quizData = JSON.parse(decodeURIComponent(escape(atob(q))));
+                    startSolveMode();
+                } catch(e) { console.error("Invalid data"); }
+            } else {
+                generateRandom20();
             }
-            if(bottles.length===0) addBottle();
+        };
+
+        function startSolveMode() {
+            isSolveMode = true;
+            document.getElementById('nav-make').classList.remove('active');
+            document.getElementById('nav-solve').classList.add('active');
+            document.getElementById('pageTitle').innerText = "友達の性癖を当てろ！";
+            document.getElementById('guideBox').innerHTML = `<span class="box-title">〜 遊び方 〜</span><div style="font-size:0.75rem; text-align:center; color:var(--guide-blue);">友達が注いだ「色」と「量」を予想して注ぎ直そう！<br>最後に答え合わせボタンを押してね。</div>`;
+            document.querySelector('.btn-random').style.display = 'none';
+            
+            // 回答用シートの準備（中身を空にする）
+            bottles = quizData.b.map(b => ({ name: b.name, color: COLORS.pink, level: 10 }));
             render();
-            Sortable.create(document.getElementById('bottleContainer'), {handle:'.drag-handle', animation:150});
+            
+            const btn = document.getElementById('actionBtn');
+            btn.innerText = "答え合わせをする！";
+            btn.onclick = checkAnswer;
         }
 
-        function setTab(el) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('previewModeTitle').innerText = el.innerText;
-        }
+        function checkAnswer() {
+            const inputPw = prompt("出題者が決めたパスワードを入力してください");
+            if(inputPw !== quizData.p) {
+                alert("パスワードが違います！パスワードを友達に聞いてみてね。");
+                return;
+            }
 
-        function updatePreview() {
-            const g = document.getElementById('previewGrid'); g.innerHTML = '';
-            bottles.forEach(b => {
-                const item = document.createElement('div'); item.style="display:flex;flex-direction:column;align-items:center;";
-                item.innerHTML = `<div class="bottle-frame" style="transform:scale(0.6);margin:0;"><div class="liquid" style="height:${b.level}%; background:${b.color}; opacity:${b.alpha};"></div></div><div style="font-size:0.6rem;font-weight:bold;color:#333;">${b.name}</div>`;
-                g.appendChild(item);
+            let totalDiff = 0;
+            const results = bottles.map((myB, i) => {
+                const ansB = quizData.b[i];
+                // スコア計算：色が違えば問答無用でレベル分が誤差。色が同じならレベルの差分。
+                let diff = 0;
+                if(myB.color !== ansB.color) {
+                    diff = myB.level + ansB.level; 
+                } else {
+                    diff = Math.abs(myB.level - ansB.level);
+                }
+                totalDiff += Math.min(diff, 100);
+                return { name: myB.name, my: myB, ans: ansB, diff: diff };
             });
-            scrollSection('previewArea');
+
+            const score = Math.max(0, 100 - Math.round(totalDiff / results.length));
+            showResult(score, results);
         }
 
-        function generateShareURL(e) {
-            const data = btoa(unescape(encodeURIComponent(JSON.stringify(bottles))));
-            const url = window.location.origin + window.location.pathname + '?d=' + data;
-            navigator.clipboard.writeText(url).then(() => { e.target.innerText = "完了！"; setTimeout(() => e.target.innerText = "URLをコピー", 2000); });
-        }
+        function showResult(score, results) {
+            document.getElementById('setupView').style.display = 'none';
+            const area = document.getElementById('resultArea');
+            area.style.display = 'block';
+            document.getElementById('totalScore').innerText = score + "%";
+            
+            let rank = ""; let comment = "";
+            if(score >= 95) { rank = "称号：【魂の双子】"; comment = "もはや本人では？恐ろしいほどの理解度です。"; }
+            else if(score >= 80) { rank = "称号：【性癖鑑定士】"; comment = "素晴らしい！友達の嗜好を完璧に把握しています。"; }
+            else if(score >= 50) { rank = "称号：【良き理解者】"; comment = "なかなかの理解度。もっと深く話し合えば100点も近い！"; }
+            else { rank = "称号：【解釈違い】"; comment = "あれれ…？全然違います。もっと修行（会話）が必要です。"; }
+            
+            document.getElementById('rankTitle').innerText = rank;
+            document.getElementById('rankComment').innerText = comment;
 
-        init();
+            const list = document.getElementById('comparisonList');
+            list.innerHTML = results.map(r => `
+                <div style="display:flex; align-items:center; justify-content:between; border-bottom:1px solid #eee; padding:10px 0;">
+                    <div style="flex:1; font-size:0.7rem; font-weight:bold;">${r.name}</div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <div class="bottle-frame" style="transform:scale(0.5); margin:0;"><div class="liquid" style="height:${r.my.level}%; background:${r.my.color}; opacity:0.8;"></div></div>
+                        <div style="font-size:0.8rem;">🆚</div>
+                        <div class="bottle-frame" style="transform:scale(0.5); margin:0;"><div class="liquid" style="height:${r.ans.level}%; background:${r.ans.color}; opacity:0.8;"></div></div>
+                    </div>
+                </div>
+            `).join('');
+            window.scrollTo(0,0);
+        }
     </script>
 </body>
 </html>
