@@ -11,7 +11,12 @@
 
         body { font-family: sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 0; color: #444; margin: 0; }
         
-        .main-title { font-size: 1.4rem; font-weight: bold; margin: 20px 0; letter-spacing: 1px; color: #333; }
+        .main-title { font-size: 1.4rem; font-weight: bold; margin: 20px 0 10px; letter-spacing: 1px; color: #333; }
+
+        /* カテゴリタブ */
+        .category-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 8px 20px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; background: #eee; color: #777; transition: 0.2s; }
+        .tab.active { background: #333; color: white; }
 
         /* ボックス */
         .box-common { width: 94%; max-width: 500px; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: white; }
@@ -41,9 +46,10 @@
 
         /* プレビュー表示用 */
         #previewArea { width: 100%; display: flex; flex-direction: column; align-items: center; padding: 30px 0; background: #eee; margin-top: 30px; }
-        .preview-content { background: var(--bg); padding: 20px; border-radius: 0; width: 100%; max-width: 800px; }
-        .preview-bottle-card { background: white; border-radius: 18px; padding: 15px 10px; text-align: center; border: 1px solid #f0f0f0; }
-        .preview-note { font-size: 0.7rem; color: #666; margin-top: 8px; min-height: 1em; white-space: pre-wrap; }
+        .preview-content { background: var(--bg); padding: 20px; border-radius: 0; width: 100%; max-width: 900px; }
+        .preview-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; } /* 4カラムに変更 */
+        .preview-bottle-card { background: white; border-radius: 12px; padding: 10px 5px; text-align: center; border: 1px solid #f0f0f0; }
+        .preview-note { font-size: 0.65rem; color: #666; margin-top: 5px; min-height: 1em; white-space: pre-wrap; line-height: 1.2; }
 
         /* モーダル */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; overflow-y: auto; }
@@ -56,6 +62,11 @@
 
     <div id="setupView" style="width:100%; display:flex; flex-direction:column; align-items:center;">
         <div class="main-title">性癖瓶メーカー</div>
+
+        <div class="category-tabs">
+            <div class="tab active" onclick="selectCategory('2D', this)">2D / 二次元</div>
+            <div class="tab" onclick="selectCategory('REAL', this)">REAL / 現実</div>
+        </div>
 
         <div class="box-common">
             <span class="box-title">🍾 瓶を選ぶ (<span id="countDisplay" style="color:var(--accent)">0</span>/20)</span>
@@ -98,8 +109,9 @@
     <div id="previewArea" style="display:none;">
         <div style="margin-bottom:15px; color:#666; font-size:0.8rem;">↓このエリアをスクリーンショットして保存↓</div>
         <div class="preview-content" id="previewTarget">
-            <div class="main-title" style="text-align:center; margin-top:0;">SEIHEKI BIN SHEET</div>
-            <div class="container" id="previewContainer" style="margin:0 auto;"></div>
+            <div id="previewCategoryLabel" style="text-align:center; font-size:0.7rem; font-weight:bold; color:var(--accent); margin-bottom:5px;">2D / 二次元</div>
+            <div class="main-title" style="text-align:center; margin:0 0 20px 0;">SEIHEKI BIN SHEET</div>
+            <div class="preview-container" id="previewContainer" style="margin:0 auto;"></div>
         </div>
         <button class="btn-mini" onclick="document.getElementById('previewArea').style.display='none'" style="margin-top:20px; background:#333; padding:10px 20px;">編集に戻る</button>
     </div>
@@ -146,6 +158,14 @@
         const COLORS = { pink: '#ff5d8f', blue: '#6366f1' };
         let selectedItems = [];
         let pressTimer = null;
+        let currentCategory = '2D';
+
+        function selectCategory(cat, el) {
+            currentCategory = cat;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('previewCategoryLabel').innerText = cat === '2D' ? '2D / 二次元' : 'REAL / 現実';
+        }
 
         function saveState() {
             localStorage.setItem('binMakerData', JSON.stringify(selectedItems));
@@ -242,7 +262,6 @@
             });
         }
 
-        // プレビュー生成機能
         function generatePreview() {
             if (selectedItems.length === 0) return alert("瓶を1つ以上選んでください！");
             const pContainer = document.getElementById('previewContainer');
@@ -252,9 +271,9 @@
                 const card = document.createElement('div');
                 card.className = 'preview-bottle-card';
                 card.innerHTML = `
-                    <div style="font-size:0.85rem; font-weight:bold; margin-bottom:8px;">${b.name}</div>
-                    <div class="bottle-frame" style="margin:5px auto;"><div class="liquid" style="height:${b.level}%; background:${b.color}; opacity:0.8;"></div></div>
-                    <div style="font-size:0.75rem; font-weight:bold; color:#666;">${b.level}%</div>
+                    <div style="font-size:0.75rem; font-weight:bold; margin-bottom:5px; height:2.2em; display:flex; align-items:center; justify-content:center; line-height:1.1;">${b.name}</div>
+                    <div class="bottle-frame" style="margin:2px auto; width:45px; height:70px; border-width:2px;"><div class="liquid" style="height:${b.level}%; background:${b.color}; opacity:0.8;"></div></div>
+                    <div style="font-size:0.65rem; font-weight:bold; color:#666;">${b.level}%</div>
                     <div class="preview-note">${b.note || ''}</div>
                 `;
                 pContainer.appendChild(card);
