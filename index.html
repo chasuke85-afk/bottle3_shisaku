@@ -162,7 +162,6 @@
         let pressTimer = null;
         let currentCategory = '2D';
 
-        // URLから項目を読み込む（初期化・色と量はリセット）
         function loadFromURL() {
             const params = new URLSearchParams(window.location.search);
             const data = params.get('items');
@@ -170,13 +169,11 @@
                 try {
                     const names = JSON.parse(decodeURIComponent(atob(data)));
                     selectedItems = names.map(name => ({ name: name, color: COLORS.pink, level: 0, note: '' }));
-                    // 以前のパスワードなど残さないようクリーンアップ
                     window.history.replaceState({}, document.title, window.location.pathname);
                 } catch(e) { console.error("URL読み込み失敗"); }
             }
         }
 
-        // 項目リストだけをURLにしてコピー
         function copyShareURL() {
             if (selectedItems.length === 0) return alert("瓶を1つ以上選んでください！");
             const names = selectedItems.map(i => i.name);
@@ -223,8 +220,8 @@
                     el.appendChild(chip);
                 });
             });
-            loadFromURL(); // URL優先
-            loadState();   // ローカルストレージ
+            loadFromURL();
+            loadState();
         }
 
         function toggleItem(name) {
@@ -251,6 +248,7 @@
             saveState();
         }
 
+        // バグ修正：全解除ボタンを正常に機能させる
         function clearAllItems() {
             if(!confirm("全ての項目を解除しますか？")) return;
             selectedItems = [];
@@ -259,10 +257,18 @@
             saveState();
         }
 
+        // バグ修正：Fisher-Yatesシャッフルで公平なランダムに変更
         function randomSelect() {
-            clearAllItems();
+            selectedItems = [];
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+            
             const all = PRESET_DATA.flatMap(g => g.items);
-            const shuffled = all.sort(() => 0.5 - Math.random()).slice(0, 20);
+            // フィッシャー–イェーツのシャッフル
+            for (let i = all.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [all[i], all[j]] = [all[j], all[i]];
+            }
+            const shuffled = all.slice(0, 20);
             shuffled.forEach(n => toggleItem(n));
         }
 
@@ -320,12 +326,15 @@
         }
         function stopPress() { clearInterval(pressTimer); saveState(); }
         function updateStep(i, dir) {
+            if (!selectedItems[i]) return;
             let next = selectedItems[i].level + dir;
             if (next < 0) next = 0;
             if (next > 100) next = 100;
             selectedItems[i].level = next;
-            document.getElementById(`liq-${i}`).style.height = next + '%';
-            document.getElementById(`lv-${i}`).innerText = next + '%';
+            const liq = document.getElementById(`liq-${i}`);
+            const lv = document.getElementById(`lv-${i}`);
+            if(liq) liq.style.height = next + '%';
+            if(lv) lv.innerText = next + '%';
         }
 
         function updateName(i, v) { selectedItems[i].name = v; saveState(); }
