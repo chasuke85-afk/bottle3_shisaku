@@ -1,320 +1,320 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>性癖瓶メーカー - SEIHEKI BIN SHEET</title>
-    <style>
-        :root { --bg: #fdfbfb; --accent: #ff4d79; --blue: #6366f1; --rule-color: #e63946; --guide-blue: #4361ee; }
-        * { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; box-sizing: border-box; }
-        input[type="text"], textarea { -webkit-user-select: text; user-select: text; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; padding: 10px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>性癖瓶メーカー - SEIHEKI BIN SHEET</title>
+    <style>
+        :root { --bg: #fdfbfb; --accent: #ff4d79; --blue: #6366f1; --rule-color: #e63946; --guide-blue: #4361ee; }
+        * { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; box-sizing: border-box; }
+        input[type="text"], textarea { -webkit-user-select: text; user-select: text; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; padding: 10px; }
 
-        body { font-family: sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 0; color: #444; margin: 0; }
-        
-        .main-title { font-size: 1.4rem; font-weight: bold; margin: 20px 0 10px; letter-spacing: 1px; color: #333; }
+        body { font-family: sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 0; color: #444; margin: 0; }
+        
+        .main-title { font-size: 1.4rem; font-weight: bold; margin: 20px 0 10px; letter-spacing: 1px; color: #333; }
 
-        /* カテゴリタブ */
-        .category-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { padding: 8px 20px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; background: #eee; color: #777; transition: 0.2s; }
-        .tab.active { background: #333; color: white; }
+        /* カテゴリタブ */
+        .category-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 8px 20px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; background: #eee; color: #777; transition: 0.2s; }
+        .tab.active { background: #333; color: white; }
 
-        /* ボックス */
-        .box-common { width: 94%; max-width: 500px; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: white; }
-        .box-title { font-size: 0.9rem; font-weight: bold; text-align: center; margin-bottom: 10px; display: block; }
-        .guide-box { border: 2px solid var(--guide-blue); background: #f5f8ff; }
+        /* ボックス */
+        .box-common { width: 94%; max-width: 500px; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: white; }
+        .box-title { font-size: 0.9rem; font-weight: bold; text-align: center; margin-bottom: 10px; display: block; }
+        .guide-box { border: 2px solid var(--guide-blue); background: #f5f8ff; }
 
-        /* 項目選択 */
-        .preset-scroll { max-height: 250px; overflow-y: auto; padding: 5px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
-        .preset-label { font-size: 0.75rem; font-weight: bold; color: #777; margin: 10px 0 5px 5px; border-left: 3px solid #ccc; padding-left: 5px; }
-        .preset-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-        .chip { font-size: 0.75rem; padding: 6px 12px; border-radius: 20px; background: #eee; cursor: pointer; }
-        .chip.selected { background: var(--accent); color: white; }
-        .selector-footer { display: flex; justify-content: space-between; margin-top: 10px; }
+        /* 項目選択 */
+        .preset-scroll { max-height: 250px; overflow-y: auto; padding: 5px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
+        .preset-label { font-size: 0.75rem; font-weight: bold; color: #777; margin: 10px 0 5px 5px; border-left: 3px solid #ccc; padding-left: 5px; }
+        .preset-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+        .chip { font-size: 0.75rem; padding: 6px 12px; border-radius: 20px; background: #eee; cursor: pointer; }
+        .chip.selected { background: var(--accent); color: white; }
+        .selector-footer { display: flex; justify-content: space-between; margin-top: 10px; }
 
-        /* 瓶エリア */
-        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 96%; max-width: 800px; padding-bottom: 20px; }
-        .bottle-card { background: white; border-radius: 18px; padding: 15px 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.07); text-align: center; position: relative; border: 1px solid #f0f0f0; }
-        .bottle-name-edit { width: 90%; font-size: 0.85rem; font-weight: bold; text-align: center; margin-bottom: 8px; border: 1px dashed #ccc; background: #fff; padding: 4px; }
-        .bottle-frame { width: 65px; height: 100px; border: 3px solid #333; border-radius: 4px 4px 22px 22px; margin: 12px auto; position: relative; overflow: hidden; background: #f0f0f0; }
-        .liquid { position: absolute; bottom: 0; width: 100%; transition: height 0.1s linear; }
-        .p-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: #f0f0f0; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; touch-action: none; }
-        .del-btn { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; background: #eee; color: #999; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
-        .comment-area { width: 100%; margin-top: 10px; font-size: 0.75rem; height: 45px; resize: none; border: 1px solid #f0f0f0; background: #fafafa; }
+        /* 瓶エリア */
+        .container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 96%; max-width: 800px; padding-bottom: 20px; }
+        .bottle-card { background: white; border-radius: 18px; padding: 15px 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.07); text-align: center; position: relative; border: 1px solid #f0f0f0; }
+        .bottle-name-edit { width: 90%; font-size: 0.85rem; font-weight: bold; text-align: center; margin-bottom: 8px; border: 1px dashed #ccc; background: #fff; padding: 4px; }
+        .bottle-frame { width: 65px; height: 100px; border: 3px solid #333; border-radius: 4px 4px 22px 22px; margin: 12px auto; position: relative; overflow: hidden; background: #f0f0f0; }
+        .liquid { position: absolute; bottom: 0; width: 100%; transition: height 0.1s linear; }
+        .p-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: #f0f0f0; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; touch-action: none; }
+        .del-btn { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; background: #eee; color: #999; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+        .comment-area { width: 100%; margin-top: 10px; font-size: 0.75rem; height: 45px; resize: none; border: 1px solid #f0f0f0; background: #fafafa; }
 
-        /* ボタン */
-        .btn-mini { font-size: 0.7rem; padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; background: #666; color: white; }
+        /* ボタン */
+        .btn-mini { font-size: 0.7rem; padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; background: #666; color: white; }
 
-        /* プレビュー表示用 */
-        #previewArea { width: 100%; display: flex; flex-direction: column; align-items: center; padding: 30px 0; background: #eee; margin-top: 30px; }
-        .preview-content { background: var(--bg); padding: 20px; border-radius: 0; width: 100%; max-width: 900px; }
-        .preview-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; } /* 4カラムに変更 */
-        .preview-bottle-card { background: white; border-radius: 12px; padding: 10px 5px; text-align: center; border: 1px solid #f0f0f0; }
-        .preview-note { font-size: 0.65rem; color: #666; margin-top: 5px; min-height: 1em; white-space: pre-wrap; line-height: 1.2; }
+        /* プレビュー表示用 */
+        #previewArea { width: 100%; display: flex; flex-direction: column; align-items: center; padding: 30px 0; background: #eee; margin-top: 30px; }
+        .preview-content { background: var(--bg); padding: 20px; border-radius: 0; width: 100%; max-width: 900px; }
+        .preview-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; } /* 4カラムに変更 */
+        .preview-bottle-card { background: white; border-radius: 12px; padding: 10px 5px; text-align: center; border: 1px solid #f0f0f0; }
+        .preview-note { font-size: 0.65rem; color: #666; margin-top: 5px; min-height: 1em; white-space: pre-wrap; line-height: 1.2; }
 
-        /* モーダル */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; overflow-y: auto; }
-        .modal-content { background: white; border-radius: 25px; padding: 25px; width: 100%; max-width: 450px; text-align: center; }
-        .modal-guide-img { display: flex; align-items: flex-end; justify-content: center; gap: 15px; margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 15px; }
-        .guide-arrow { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: bold; }
-    </style>
+        /* モーダル */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; overflow-y: auto; }
+        .modal-content { background: white; border-radius: 25px; padding: 25px; width: 100%; max-width: 450px; text-align: center; }
+        .modal-guide-img { display: flex; align-items: flex-end; justify-content: center; gap: 15px; margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 15px; }
+        .guide-arrow { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: bold; }
+    </style>
 </head>
 <body>
 
-    <div id="setupView" style="width:100%; display:flex; flex-direction:column; align-items:center;">
-        <div class="main-title">性癖瓶メーカー</div>
+    <div id="setupView" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+        <div class="main-title">性癖瓶メーカー</div>
 
-        <div class="category-tabs">
-            <div class="tab active" onclick="selectCategory('2D', this)">2D / 二次元</div>
-            <div class="tab" onclick="selectCategory('REAL', this)">REAL / 現実</div>
-        </div>
+        <div class="category-tabs">
+            <div class="tab active" onclick="selectCategory('2D', this)">2D / 二次元</div>
+            <div class="tab" onclick="selectCategory('REAL', this)">REAL / 現実</div>
+        </div>
 
-        <div class="box-common">
-            <span class="box-title">🍾 瓶を選ぶ (<span id="countDisplay" style="color:var(--accent)">0</span>/20)</span>
-            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                <input type="text" id="customInput" placeholder="好きな項目を制作できます..." style="flex: 1;">
-                <button onclick="addCustomItem()" style="background: #333; color: white; border: none; border-radius: 8px; padding: 0 15px; font-weight: bold;">追加</button>
-            </div>
+        <div class="box-common">
+            <span class="box-title">🍾 瓶を選ぶ (<span id="countDisplay" style="color:var(--accent)">0</span>/20)</span>
+            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <input type="text" id="customInput" placeholder="自由入力..." style="flex: 1;">
+                <button onclick="addCustomItem()" style="background: #333; color: white; border: none; border-radius: 8px; padding: 0 15px; font-weight: bold;">追加</button>
+            </div>
 
-            <div class="preset-scroll" id="presetScrollArea">
-                <div class="preset-label">身体・部位</div><div class="preset-group" id="pre-1"></div>
-                <div class="preset-label">髪型</div><div class="preset-group" id="pre-2"></div>
-                <div class="preset-label">関係・シチュ</div><div class="preset-group" id="pre-3"></div>
-                <div class="preset-label">性向・属性</div><div class="preset-group" id="pre-4"></div>
-                <div class="preset-label">行為・行動</div><div class="preset-group" id="pre-5"></div>
-            </div>
+            <div class="preset-scroll" id="presetScrollArea">
+                <div class="preset-label">身体・部位</div><div class="preset-group" id="pre-1"></div>
+                <div class="preset-label">髪型</div><div class="preset-group" id="pre-2"></div>
+                <div class="preset-label">関係・シチュ</div><div class="preset-group" id="pre-3"></div>
+                <div class="preset-label">性向・属性</div><div class="preset-group" id="pre-4"></div>
+                <div class="preset-label">行為・行動</div><div class="preset-group" id="pre-5"></div>
+            </div>
 
-            <div class="selector-footer">
-                <button class="btn-mini" onclick="clearAllItems()" style="background:#bbb;">全解除</button>
-                <button class="btn-mini" onclick="randomSelect()" style="background:var(--guide-blue);">ランダムに20個選ぶ</button>
-            </div>
-        </div>
+            <div class="selector-footer">
+                <button class="btn-mini" onclick="clearAllItems()" style="background:#bbb;">全解除</button>
+                <button class="btn-mini" onclick="randomSelect()" style="background:var(--guide-blue);">ランダムに20個選ぶ</button>
+            </div>
+        </div>
 
-        <div class="box-common guide-box">
-            <span class="box-title">〜 使い方 〜</span>
-            <div style="font-size: 0.8rem; line-height: 1.8; color: var(--guide-blue); font-weight: bold; text-align: center;">
-                1. 瓶を最大20個選ぶ（自由入力・名称変更OK！）<br>
-                2. 下の瓶の色を選択し、「性癖」を注ぐ<br>
-                3. 完成したらスクリーンショットで保存！
-            </div>
-            <button class="btn-mini" onclick="toggleModal(true)" style="width:100%; margin-top:12px; background:var(--rule-color); height:40px; font-size:0.85rem;">色のルール・図解を見る</button>
-        </div>
+        <div class="box-common guide-box">
+            <span class="box-title">〜 使い方 〜</span>
+            <div style="font-size: 0.8rem; line-height: 1.8; color: var(--guide-blue); font-weight: bold; text-align: center;">
+                1. 瓶を最大20個選ぶ（自由入力・名称変更OK）<br>
+                2. 下の瓶に「色」と「量」を注ぐ<br>
+                3. 完成したらスクリーンショットで保存！
+            </div>
+            <button class="btn-mini" onclick="toggleModal(true)" style="width:100%; margin-top:12px; background:var(--rule-color); height:40px; font-size:0.85rem;">色のルール・図解を見る</button>
+        </div>
 
-        <div class="container" id="bottleContainer"></div>
+        <div class="container" id="bottleContainer"></div>
 
-        <button onclick="generatePreview()" style="width:94%; max-width:500px; height:50px; background:#333; color:white; border-radius:12px; border:none; font-weight:bold; font-size:1rem; margin: 20px 0; cursor:pointer;">
-            完成プレビューを表示する
-        </button>
-    </div>
+        <button onclick="generatePreview()" style="width:94%; max-width:500px; height:50px; background:#333; color:white; border-radius:12px; border:none; font-weight:bold; font-size:1rem; margin: 20px 0; cursor:pointer;">
+            ✨ 完成プレビューを表示する
+        </button>
+    </div>
 
-    <div id="previewArea" style="display:none;">
-        <div style="margin-bottom:15px; color:#666; font-size:0.8rem;">↓このエリアをスクリーンショットして保存↓</div>
-        <div class="preview-content" id="previewTarget">
-            <div id="previewCategoryLabel" style="text-align:center; font-size:0.7rem; font-weight:bold; color:var(--accent); margin-bottom:5px;">2D / 二次元</div>
-            <div class="main-title" style="text-align:center; margin:0 0 20px 0;">SEIHEKI BIN SHEET</div>
-            <div class="preview-container" id="previewContainer" style="margin:0 auto;"></div>
-        </div>
-        <button class="btn-mini" onclick="document.getElementById('previewArea').style.display='none'" style="margin-top:20px; background:#333; padding:10px 20px;">編集に戻る</button>
-    </div>
+    <div id="previewArea" style="display:none;">
+        <div style="margin-bottom:15px; color:#666; font-size:0.8rem;">↓このエリアをスクリーンショットして保存↓</div>
+        <div class="preview-content" id="previewTarget">
+            <div id="previewCategoryLabel" style="text-align:center; font-size:0.7rem; font-weight:bold; color:var(--accent); margin-bottom:5px;">2D / 二次元</div>
+            <div class="main-title" style="text-align:center; margin:0 0 20px 0;">SEIHEKI BIN SHEET</div>
+            <div class="preview-container" id="previewContainer" style="margin:0 auto;"></div>
+        </div>
+        <button class="btn-mini" onclick="document.getElementById('previewArea').style.display='none'" style="margin-top:20px; background:#333; padding:10px 20px;">編集に戻る</button>
+    </div>
 
-    <div class="modal-overlay" id="ruleModal" onclick="toggleModal(false)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="color:var(--rule-color); margin-top:0;">性癖瓶の注ぎ方</h3>
-            
-            <div class="modal-guide-img">
-                <div class="guide-arrow">
-                    <span style="color:var(--accent)">好き！</span>
-                    <div style="font-size:1.5rem;">↑</div>
-                </div>
-                <div class="bottle-frame" style="margin:0; width:55px; height:80px; border-width:2px;">
-                    <div class="liquid" style="height:70%; background:var(--accent); opacity:0.8;"></div>
-                </div>
-                <div class="bottle-frame" style="margin:0; width:55px; height:80px; border-width:2px;">
-                    <div class="liquid" style="height:40%; background:var(--blue); opacity:0.8;"></div>
-                </div>
-                <div class="guide-arrow">
-                    <span style="color:var(--blue)">苦手…</span>
-                    <div style="font-size:1.5rem;">↑</div>
-                </div>
-            </div>
+    <div class="modal-overlay" id="ruleModal" onclick="toggleModal(false)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 style="color:var(--rule-color); margin-top:0;">性癖瓶の注ぎ方</h3>
+            
+            <div class="modal-guide-img">
+                <div class="guide-arrow">
+                    <span style="color:var(--accent)">好き！</span>
+                    <div style="font-size:1.5rem;">↑</div>
+                </div>
+                <div class="bottle-frame" style="margin:0; width:55px; height:80px; border-width:2px;">
+                    <div class="liquid" style="height:70%; background:var(--accent); opacity:0.8;"></div>
+                </div>
+                <div class="bottle-frame" style="margin:0; width:55px; height:80px; border-width:2px;">
+                    <div class="liquid" style="height:40%; background:var(--blue); opacity:0.8;"></div>
+                </div>
+                <div class="guide-arrow">
+                    <span style="color:var(--blue)">苦手…</span>
+                    <div style="font-size:1.5rem;">↑</div>
+                </div>
+            </div>
 
-            <div style="text-align:left; font-size:0.8rem; line-height:1.6; color:#555;">
-                <p>● <b>色（属性）</b>：ピンクは「好き」、ブルーは「苦手・地雷」を指します。</p>
-                <p>● <b>量（熱量）</b>：1%〜100%で注ぎます。量が多いほど、その感情が強いことを示します。</p>
-                <p>● <b>コメント</b>：瓶の下の欄に自分のこだわり（や）を自由に書けます。</p>
-            </div>
-            
-            <button class="btn-mini" style="width:100%; height:45px; margin:20px 0 0; background:#333; font-size:1rem;" onclick="toggleModal(false)">閉じる</button>
-        </div>
-    </div>
+            <div style="text-align:left; font-size:0.8rem; line-height:1.6; color:#555;">
+                <p>● <b>色（属性）</b>：ピンクは「好き」、ブルーは「苦手・地雷」を指します。</p>
+                <p>● <b>量（熱量）</b>：1%〜100%で注ぎます。量が多いほど、その感情が強いことを示します。</p>
+                <p>● <b>コメント</b>：瓶の下の欄に自分のこだわりを自由に書けます。</p>
+            </div>
+            
+            <button class="btn-mini" style="width:100%; height:45px; margin:20px 0 0; background:#333; font-size:1rem;" onclick="toggleModal(false)">OK！理解した</button>
+        </div>
+    </div>
 
-    <script>
-        const PRESET_DATA = [
-            {id:'pre-1', items:['長身','小柄','モデル体型','日焼け','褐色','貧乳・微乳','巨乳','お尻','手','生足・太もも','おへそ','背中','そばかす']}, 
-            {id:'pre-2', items:['ショートヘア','ロングヘア','ボブヘア','ポニーテール','ツインテール','お団子ヘア','ウルフカット','インナーカラー','ぱっつん','三つ編み','シースルーバング','デコ出し']}, 
-            {id:'pre-3', items:['体格差','主従関係','密室','コスプレ','お漏らし','先生と生徒','NTR','野外・露出','幼馴染','同い年','背徳感','制服']}, 
-            {id:'pre-4', items:['ロリ','ショタ','お姉さん','妹・姉','ギャル','メスガキ','清楚','清楚ビッチ','無口','クーデレ','地雷系','TS','ツンデレ','天然・ドジっ子','小悪魔','ギャップ萌え','外国人・ハーフ','男の娘','眼鏡女子','オタク女子','強気・男勝り','スポーツ女子','高学歴女子','一人称名前']}, 
-            {id:'pre-5', items:['ローション・オイル','汗','あくび','くしゃみ','焦らし','指舐め','声','囁き・耳攻め','首絞め','命令','催眠','目隠し','緊縛','放置','拘束','M','S','キス','ハグ']} 
-        ];
-        const COLORS = { pink: '#ff5d8f', blue: '#6366f1' };
-        let selectedItems = [];
-        let pressTimer = null;
-        let currentCategory = '2D';
+    <script>
+        const PRESET_DATA = [
+            {id:'pre-1', items:['長身','小柄','モデル体型','日焼け','褐色','貧乳・微乳','巨乳','お尻','手','生足・太もも','おへそ','背中','そばかす']}, 
+            {id:'pre-2', items:['ショートヘア','ロングヘア','ボブヘア','ポニーテール','ツインテール','お団子ヘア','ウルフカット','インナーカラー','ぱっつん','三つ編み','シースルーバング','デコ出し']}, 
+            {id:'pre-3', items:['体格差','主従関係','密室','コスプレ','お漏らし','先生と生徒','NTR','野外・露出','幼馴染','同い年','背徳感','制服']}, 
+            {id:'pre-4', items:['ロリ','ショタ','お姉さん','妹・姉','ギャル','メスガキ','清楚','清楚ビッチ','無口','クーデレ','地雷系','TS','ツンデレ','天然・ドジっ子','小悪魔','ギャップ萌え','外国人・ハーフ','男の娘','眼鏡女子','オタク女子','強気・男勝り','スポーツ女子','高学歴女子','一人称名前']}, 
+            {id:'pre-5', items:['ローション・オイル','汗','あくび','くしゃみ','焦らし','指舐め','声','囁き・耳攻め','首絞め','命令','催眠','目隠し','緊縛','放置','拘束','M','S','キス','ハグ']} 
+        ];
+        const COLORS = { pink: '#ff5d8f', blue: '#6366f1' };
+        let selectedItems = [];
+        let pressTimer = null;
+        let currentCategory = '2D';
 
-        function selectCategory(cat, el) {
-            currentCategory = cat;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('previewCategoryLabel').innerText = cat === '2D' ? '2D / 二次元' : 'REAL / 現実';
-        }
+        function selectCategory(cat, el) {
+            currentCategory = cat;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('previewCategoryLabel').innerText = cat === '2D' ? '2D / 二次元' : 'REAL / 現実';
+        }
 
-        function saveState() {
-            localStorage.setItem('binMakerData', JSON.stringify(selectedItems));
-        }
+        function saveState() {
+            localStorage.setItem('binMakerData', JSON.stringify(selectedItems));
+        }
 
-        function loadState() {
-            const saved = localStorage.getItem('binMakerData');
-            if (saved) {
-                selectedItems = JSON.parse(saved);
-                selectedItems.forEach(item => {
-                    const chip = document.getElementById('chip-' + item.name);
-                    if (chip) chip.classList.add('selected');
-                });
-                renderBottles();
-            }
-        }
+        function loadState() {
+            const saved = localStorage.getItem('binMakerData');
+            if (saved) {
+                selectedItems = JSON.parse(saved);
+                selectedItems.forEach(item => {
+                    const chip = document.getElementById('chip-' + item.name);
+                    if (chip) chip.classList.add('selected');
+                });
+                renderBottles();
+            }
+        }
 
-        function init() {
-            PRESET_DATA.forEach(group => {
-                const el = document.getElementById(group.id);
-                group.items.forEach(name => {
-                    const chip = document.createElement('div');
-                    chip.className = 'chip';
-                    chip.innerText = name;
-                    chip.id = 'chip-' + name;
-                    chip.onclick = () => toggleItem(name);
-                    el.appendChild(chip);
-                });
-            });
-            loadState();
-        }
+        function init() {
+            PRESET_DATA.forEach(group => {
+                const el = document.getElementById(group.id);
+                group.items.forEach(name => {
+                    const chip = document.createElement('div');
+                    chip.className = 'chip';
+                    chip.innerText = name;
+                    chip.id = 'chip-' + name;
+                    chip.onclick = () => toggleItem(name);
+                    el.appendChild(chip);
+                });
+            });
+            loadState();
+        }
 
-        function toggleItem(name) {
-            const idx = selectedItems.findIndex(i => i.name === name);
-            if (idx > -1) {
-                selectedItems.splice(idx, 1);
-                document.getElementById('chip-' + name)?.classList.remove('selected');
-            } else {
-                if (selectedItems.length >= 20) return alert("上限20個です！");
-                selectedItems.push({ name: name, color: COLORS.pink, level: 50, note: '' });
-                document.getElementById('chip-' + name)?.classList.add('selected');
-            }
-            renderBottles();
-            saveState();
-        }
+        function toggleItem(name) {
+            const idx = selectedItems.findIndex(i => i.name === name);
+            if (idx > -1) {
+                selectedItems.splice(idx, 1);
+                document.getElementById('chip-' + name)?.classList.remove('selected');
+            } else {
+                if (selectedItems.length >= 20) return alert("上限20個です！");
+                selectedItems.push({ name: name, color: COLORS.pink, level: 50, note: '' });
+                document.getElementById('chip-' + name)?.classList.add('selected');
+            }
+            renderBottles();
+            saveState();
+        }
 
-        function addCustomItem() {
-            const val = document.getElementById('customInput').value.trim();
-            if (!val) return;
-            if (selectedItems.length >= 20) return alert("上限20個です！");
-            selectedItems.push({ name: val, color: COLORS.pink, level: 50, note: '' });
-            document.getElementById('customInput').value = '';
-            renderBottles();
-            saveState();
-        }
+        function addCustomItem() {
+            const val = document.getElementById('customInput').value.trim();
+            if (!val) return;
+            if (selectedItems.length >= 20) return alert("上限20個です！");
+            selectedItems.push({ name: val, color: COLORS.pink, level: 50, note: '' });
+            document.getElementById('customInput').value = '';
+            renderBottles();
+            saveState();
+        }
 
-        function clearAllItems() {
-            selectedItems = [];
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-            renderBottles();
-            saveState();
-        }
+        function clearAllItems() {
+            selectedItems = [];
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+            renderBottles();
+            saveState();
+        }
 
-        function randomSelect() {
-            clearAllItems();
-            const all = PRESET_DATA.flatMap(g => g.items);
-            const shuffled = all.sort(() => 0.5 - Math.random()).slice(0, 20);
-            shuffled.forEach(n => toggleItem(n));
-        }
+        function randomSelect() {
+            clearAllItems();
+            const all = PRESET_DATA.flatMap(g => g.items);
+            const shuffled = all.sort(() => 0.5 - Math.random()).slice(0, 20);
+            shuffled.forEach(n => toggleItem(n));
+        }
 
-        function renderBottles() {
-            document.getElementById('countDisplay').innerText = selectedItems.length;
-            const container = document.getElementById('bottleContainer');
-            container.innerHTML = '';
-            selectedItems.forEach((b, i) => {
-                const card = document.createElement('div');
-                card.className = 'bottle-card';
-                card.innerHTML = `
-                    <div class="del-btn" onclick="removeItem(${i})">×</div>
-                    <input type="text" class="bottle-name-edit" value="${b.name}" onchange="updateName(${i}, this.value)">
-                    <div style="display:flex; justify-content:center; gap:12px; margin-bottom:5px;">
-                        <div style="width:18px;height:18px;border-radius:50%;background:${COLORS.pink};border:${b.color===COLORS.pink?'3px solid #333':'none'}" onclick="updateColor(${i},'pink')"></div>
-                        <div style="width:18px;height:18px;border-radius:50%;background:${COLORS.blue};border:${b.color===COLORS.blue?'3px solid #333':'none'}" onclick="updateColor(${i},'blue')"></div>
-                    </div>
-                    <div class="bottle-frame"><div id="liq-${i}" class="liquid" style="height:${b.level}%; background:${b.color}; opacity:0.8;"></div></div>
-                    <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
-                        <button class="p-btn" onmousedown="startPress(${i},-2)" ontouchstart="startPress(${i},-2)" onmouseup="stopPress()" ontouchend="stopPress()" onmouseleave="stopPress()">−</button>
-                        <span id="lv-${i}" style="font-size:0.85rem; font-weight:bold; width:35px;">${b.level}%</span>
-                        <button class="p-btn" onmousedown="startPress(${i},2)" ontouchstart="startPress(${i},2)" onmouseup="stopPress()" ontouchend="stopPress()" onmouseleave="stopPress()">+</button>
-                    </div>
-                    <textarea class="comment-area" placeholder="解説(任意)..." onchange="updateNote(${i}, this.value)">${b.note || ''}</textarea>
-                `;
-                container.appendChild(card);
-            });
-        }
+        function renderBottles() {
+            document.getElementById('countDisplay').innerText = selectedItems.length;
+            const container = document.getElementById('bottleContainer');
+            container.innerHTML = '';
+            selectedItems.forEach((b, i) => {
+                const card = document.createElement('div');
+                card.className = 'bottle-card';
+                card.innerHTML = `
+                    <div class="del-btn" onclick="removeItem(${i})">×</div>
+                    <input type="text" class="bottle-name-edit" value="${b.name}" onchange="updateName(${i}, this.value)">
+                    <div style="display:flex; justify-content:center; gap:12px; margin-bottom:5px;">
+                        <div style="width:18px;height:18px;border-radius:50%;background:${COLORS.pink};border:${b.color===COLORS.pink?'3px solid #333':'none'}" onclick="updateColor(${i},'pink')"></div>
+                        <div style="width:18px;height:18px;border-radius:50%;background:${COLORS.blue};border:${b.color===COLORS.blue?'3px solid #333':'none'}" onclick="updateColor(${i},'blue')"></div>
+                    </div>
+                    <div class="bottle-frame"><div id="liq-${i}" class="liquid" style="height:${b.level}%; background:${b.color}; opacity:0.8;"></div></div>
+                    <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+                        <button class="p-btn" onmousedown="startPress(${i},-2)" ontouchstart="startPress(${i},-2)" onmouseup="stopPress()" ontouchend="stopPress()" onmouseleave="stopPress()">−</button>
+                        <span id="lv-${i}" style="font-size:0.85rem; font-weight:bold; width:35px;">${b.level}%</span>
+                        <button class="p-btn" onmousedown="startPress(${i},2)" ontouchstart="startPress(${i},2)" onmouseup="stopPress()" ontouchend="stopPress()" onmouseleave="stopPress()">+</button>
+                    </div>
+                    <textarea class="comment-area" placeholder="解説(任意)..." onchange="updateNote(${i}, this.value)">${b.note || ''}</textarea>
+                `;
+                container.appendChild(card);
+            });
+        }
 
-        function generatePreview() {
-            if (selectedItems.length === 0) return alert("瓶を1つ以上選んでください！");
-            const pContainer = document.getElementById('previewContainer');
-            pContainer.innerHTML = '';
-            
-            selectedItems.forEach(b => {
-                const card = document.createElement('div');
-                card.className = 'preview-bottle-card';
-                card.innerHTML = `
-                    <div style="font-size:0.75rem; font-weight:bold; margin-bottom:5px; height:2.2em; display:flex; align-items:center; justify-content:center; line-height:1.1;">${b.name}</div>
-                    <div class="bottle-frame" style="margin:2px auto; width:45px; height:70px; border-width:2px;"><div class="liquid" style="height:${b.level}%; background:${b.color}; opacity:0.8;"></div></div>
-                    <div style="font-size:0.65rem; font-weight:bold; color:#666;">${b.level}%</div>
-                    <div class="preview-note">${b.note || ''}</div>
-                `;
-                pContainer.appendChild(card);
-            });
+        function generatePreview() {
+            if (selectedItems.length === 0) return alert("瓶を1つ以上選んでください！");
+            const pContainer = document.getElementById('previewContainer');
+            pContainer.innerHTML = '';
+            
+            selectedItems.forEach(b => {
+                const card = document.createElement('div');
+                card.className = 'preview-bottle-card';
+                card.innerHTML = `
+                    <div style="font-size:0.75rem; font-weight:bold; margin-bottom:5px; height:2.2em; display:flex; align-items:center; justify-content:center; line-height:1.1;">${b.name}</div>
+                    <div class="bottle-frame" style="margin:2px auto; width:45px; height:70px; border-width:2px;"><div class="liquid" style="height:${b.level}%; background:${b.color}; opacity:0.8;"></div></div>
+                    <div style="font-size:0.65rem; font-weight:bold; color:#666;">${b.level}%</div>
+                    <div class="preview-note">${b.note || ''}</div>
+                `;
+                pContainer.appendChild(card);
+            });
 
-            document.getElementById('previewArea').style.display = 'flex';
-            window.scrollTo(0, document.body.scrollHeight);
-        }
+            document.getElementById('previewArea').style.display = 'flex';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
 
-        function startPress(i, dir) {
-            stopPress();
-            updateStep(i, dir);
-            pressTimer = setInterval(() => updateStep(i, dir), 60);
-        }
-        function stopPress() { 
-            clearInterval(pressTimer); 
-            saveState();
-        }
-        function updateStep(i, dir) {
-            let next = selectedItems[i].level + dir;
-            if (next < 1) next = 1;
-            if (next > 100) next = 100;
-            selectedItems[i].level = next;
-            document.getElementById(`liq-${i}`).style.height = next + '%';
-            document.getElementById(`lv-${i}`).innerText = next + '%';
-        }
+        function startPress(i, dir) {
+            stopPress();
+            updateStep(i, dir);
+            pressTimer = setInterval(() => updateStep(i, dir), 60);
+        }
+        function stopPress() { 
+            clearInterval(pressTimer); 
+            saveState();
+        }
+        function updateStep(i, dir) {
+            let next = selectedItems[i].level + dir;
+            if (next < 1) next = 1;
+            if (next > 100) next = 100;
+            selectedItems[i].level = next;
+            document.getElementById(`liq-${i}`).style.height = next + '%';
+            document.getElementById(`lv-${i}`).innerText = next + '%';
+        }
 
-        function updateName(i, v) { selectedItems[i].name = v; saveState(); }
-        function updateNote(i, v) { selectedItems[i].note = v; saveState(); }
-        function updateColor(i, type) { selectedItems[i].color = COLORS[type]; renderBottles(); saveState(); }
-        
-        function removeItem(i) { 
-            const name = selectedItems[i].name;
-            selectedItems.splice(i, 1); 
-            document.getElementById('chip-' + name)?.classList.remove('selected');
-            renderBottles(); 
-            saveState();
-        }
-        function toggleModal(s) { document.getElementById('ruleModal').style.display = s ? 'flex' : 'none'; }
+        function updateName(i, v) { selectedItems[i].name = v; saveState(); }
+        function updateNote(i, v) { selectedItems[i].note = v; saveState(); }
+        function updateColor(i, type) { selectedItems[i].color = COLORS[type]; renderBottles(); saveState(); }
+        
+        function removeItem(i) { 
+            const name = selectedItems[i].name;
+            selectedItems.splice(i, 1); 
+            document.getElementById('chip-' + name)?.classList.remove('selected');
+            renderBottles(); 
+            saveState();
+        }
+        function toggleModal(s) { document.getElementById('ruleModal').style.display = s ? 'flex' : 'none'; }
 
-        window.onload = init;
-    </script>
+        window.onload = init;
+    </script>
 </body>
 </html>
