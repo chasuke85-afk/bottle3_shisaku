@@ -161,27 +161,63 @@
         let selectedItems = [];
         let pressTimer = null;
         let currentCategory = '2D';
+        const ALL_PRESETS = PRESET_DATA.flatMap(g => g.items);
 
+        // URL短縮化：インデックス方式の読み込み
         function loadFromURL() {
             const params = new URLSearchParams(window.location.search);
             const data = params.get('items');
             if (data) {
                 try {
-                    const names = JSON.parse(decodeURIComponent(atob(data)));
+                    let names = [];
+                    // 新形式（短縮URL）：カンマ区切りの数値が含まれるかチェック
+                    if (data.includes(',') || !isNaN(data.split('_')[0])) {
+                        const parts = data.split('_'); // プリセットindex群 _ 自由入力Base64
+                        if (parts[0]) {
+                            parts[0].split(',').forEach(idx => {
+                                if (ALL_PRESETS[parseInt(idx)]) names.push(ALL_PRESETS[parseInt(idx)]);
+                            });
+                        }
+                        if (parts[1]) {
+                            const customs = JSON.parse(decodeURIComponent(atob(parts[1])));
+                            names = names.concat(customs);
+                        }
+                    } else {
+                        // 旧形式互換
+                        names = JSON.parse(decodeURIComponent(atob(data)));
+                    }
                     selectedItems = names.map(name => ({ name: name, color: COLORS.pink, level: 0, note: '' }));
                     window.history.replaceState({}, document.title, window.location.pathname);
-                } catch(e) { console.error("URL読み込み失敗"); }
+                } catch(e) { console.error("URL読み込み失敗", e); }
             }
         }
 
+        // URL短縮化：インデックス方式の発行
         function copyShareURL() {
             if (selectedItems.length === 0) return alert("瓶を1つ以上選んでください！");
-            const names = selectedItems.map(i => i.name);
-            const encoded = btoa(encodeURIComponent(JSON.stringify(names)));
-            const url = window.location.origin + window.location.pathname + '?items=' + encoded;
+            
+            const presetIndices = [];
+            const customNames = [];
+
+            selectedItems.forEach(item => {
+                const idx = ALL_PRESETS.indexOf(item.name);
+                if (idx !== -1) {
+                    presetIndices.push(idx);
+                } else {
+                    customNames.push(item.name);
+                }
+            });
+
+            // プリセットindex（カンマ区切り） + 自由入力（Base64）をアンダーバーで連結
+            let shortData = presetIndices.join(',');
+            if (customNames.length > 0) {
+                shortData += '_' + btoa(encodeURIComponent(JSON.stringify(customNames)));
+            }
+            
+            const url = window.location.origin + window.location.pathname + '?items=' + shortData;
             
             navigator.clipboard.writeText(url).then(() => {
-                alert("「空の瓶シート」のURLをコピーしました！\n友達に送って、あなたの好きな項目を注いでもらいましょう。");
+                alert("「空の瓶シート」の短縮URLをコピーしました！");
             });
         }
 
@@ -248,7 +284,6 @@
             saveState();
         }
 
-        // バグ修正：全解除ボタンを正常に機能させる
         function clearAllItems() {
             if(!confirm("全ての項目を解除しますか？")) return;
             selectedItems = [];
@@ -257,13 +292,10 @@
             saveState();
         }
 
-        // バグ修正：Fisher-Yatesシャッフルで公平なランダムに変更
         function randomSelect() {
             selectedItems = [];
             document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-            
-            const all = PRESET_DATA.flatMap(g => g.items);
-            // フィッシャー–イェーツのシャッフル
+            const all = [...ALL_PRESETS];
             for (let i = all.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [all[i], all[j]] = [all[j], all[i]];
@@ -302,7 +334,6 @@
             if (selectedItems.length === 0) return alert("瓶を1つ以上選んでください！");
             const pContainer = document.getElementById('previewContainer');
             pContainer.innerHTML = '';
-            
             selectedItems.forEach(b => {
                 const card = document.createElement('div');
                 card.className = 'preview-bottle-card';
@@ -314,7 +345,6 @@
                 `;
                 pContainer.appendChild(card);
             });
-
             document.getElementById('previewArea').style.display = 'flex';
             window.scrollTo(0, document.body.scrollHeight);
         }
