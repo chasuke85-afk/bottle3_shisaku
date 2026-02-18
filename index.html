@@ -71,7 +71,7 @@
         <div class="box-common">
             <span class="box-title">🍾 瓶を選ぶ (<span id="countDisplay" style="color:var(--accent)">0</span>/20)</span>
             <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                <input type="text" id="customInput" placeholder="自由入力..." style="flex: 1;">
+                <input type="text" id="customInput" placeholder="好きな項目を制作できます..." style="flex: 1;">
                 <button onclick="addCustomItem()" style="background: #333; color: white; border: none; border-radius: 8px; padding: 0 15px; font-weight: bold;">追加</button>
             </div>
 
@@ -92,8 +92,8 @@
         <div class="box-common guide-box">
             <span class="box-title">〜 使い方 〜</span>
             <div style="font-size: 0.8rem; line-height: 1.8; color: var(--guide-blue); font-weight: bold; text-align: center;">
-                1. 瓶を最大20個選ぶ（自由入力・名称変更OK）<br>
-                2. 下の瓶に「色」と「量」を注ぐ<br>
+                1. 瓶を最大20個選ぶ（自由入力・名称変更OK！）<br>
+                2. 下の瓶の色を選択し、「性癖」を注ぐ<br>
                 3. 完成したらスクリーンショットで保存！
             </div>
             <button class="btn-mini" onclick="toggleModal(true)" style="width:100%; margin-top:12px; background:var(--rule-color); height:40px; font-size:0.85rem;">色のルール・図解を見る</button>
@@ -102,7 +102,7 @@
         <div class="container" id="bottleContainer"></div>
 
         <button onclick="generatePreview()" style="width:94%; max-width:500px; height:50px; background:#333; color:white; border-radius:12px; border:none; font-weight:bold; font-size:1rem; margin: 20px 0; cursor:pointer;">
-            ✨ 完成プレビューを表示する
+            完成プレビューを表示する
         </button>
     </div>
 
@@ -140,10 +140,10 @@
             <div style="text-align:left; font-size:0.8rem; line-height:1.6; color:#555;">
                 <p>● <b>色（属性）</b>：ピンクは「好き」、ブルーは「苦手・地雷」を指します。</p>
                 <p>● <b>量（熱量）</b>：1%〜100%で注ぎます。量が多いほど、その感情が強いことを示します。</p>
-                <p>● <b>コメント</b>：瓶の下の欄に自分のこだわりを自由に書けます。</p>
+                <p>● <b>コメント</b>：瓶の下の欄に自分のこだわり（や）を自由に書けます。</p>
             </div>
             
-            <button class="btn-mini" style="width:100%; height:45px; margin:20px 0 0; background:#333; font-size:1rem;" onclick="toggleModal(false)">OK！理解した</button>
+            <button class="btn-mini" style="width:100%; height:45px; margin:20px 0 0; background:#333; font-size:1rem;" onclick="toggleModal(false)">閉じる</button>
         </div>
     </div>
 
